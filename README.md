@@ -13,5 +13,12 @@ pip install -r requirements/development.txt
 ```
 
 ### 1.2 使用virtualenv
-## shaoye:push test
 
+
+
+------
+
+
+
+[爬虫教程]: https://www.gitbook.com/book/piaosanlang/spiders
+[Scrapy-Redis]: https://scrapy-redis.readthedocs.io/en/stable/
