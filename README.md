@@ -13,4 +13,5 @@ pip install -r requirements/development.txt
 ```
 
 ### 1.2 使用virtualenv
+##shaoye:push test
 
