@@ -21,4 +21,5 @@ pip install -r requirements/development.txt
 
 * https://www.gitbook.com/book/piaosanlang/spiders
 * https://scrapy-redis.readthedocs.io/en/stable/
+* http://brucedone.com/archives/771
 
