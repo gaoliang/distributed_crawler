@@ -15,8 +15,7 @@ pip install -r requirements/development.txt
 ### 1.2 使用virtualenv
 ------
 ### Build a local portia image
-* 安装`Node.js <https://nodejs.org/en/download/package-manager/>`_ 和 `Bower <https://bower.io/#install-bower>`_ 和 `ember-cli <https://ember-cli.com/>`_ 
-* Build
+* 安装[Node.js](https://nodejs.org/en/download/package-manager/)和 [Bower](https://bower.io/#install-bower) 和 [ember-cli](https://ember-cli.com/) 
 ```bash
 git clone https://github.com/scrapinghub/portia.git
 cd portia/portiaui
