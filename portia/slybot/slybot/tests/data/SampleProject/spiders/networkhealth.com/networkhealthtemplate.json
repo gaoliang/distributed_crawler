@@ -1,0 +1,7 @@
+{
+    "extractors": {},
+    "url": "http://www.networkhealth.com/network-health-plan-info/all/find-a-doctor/provider-search-provider-detail.aspx?Id=P00138746&Network=HMO/POS",
+    "scrapes": "doctor",
+    "page_type": "item",
+    "page_id": "50b67886d559307f097be904"
+}
