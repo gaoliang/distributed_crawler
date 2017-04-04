@@ -15,14 +15,13 @@ pip install -r requirements/development.txt
 ### 1.2 使用virtualenv
 ------
 ### Build a local portia image
-<<<<<<< HEAD
+
 
 * 安装[Node.js](https://nodejs.org/en/download/package-manager/)和 [Bower](https://bower.io/#install-bower) 和 [ember-cli](https://ember-cli.com/)  
 
 
-=======
 * 安装 [Node.js](https://nodejs.org/en/download/package-manager/) 和 [Bower](https://bower.io/#install-bower) 和 [ember-cli](https://ember-cli.com/) (在mac上可全部使用brew安装）
->>>>>>> b1967a57ad1b7aaf91f90a88ff68bbd9a76e31f3
+
 * Build
 ```bash
 git clone https://github.com/scrapinghub/portia.git
@@ -35,12 +34,7 @@ docker build . -t portia
 * Run
 ```bash
  docker run -i -t --rm -v ~/scrapinghub/data:/app/slyd/slyd/data/projects:rw -p 9001:9001 portia
-<<<<<<< HEAD
-```
-=======
  ```
-
->>>>>>> 1d0735813c366ce1428e9cfaf99bce6ab8339aa0
 
 
 
