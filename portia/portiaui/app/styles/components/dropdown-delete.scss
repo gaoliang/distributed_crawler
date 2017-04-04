@@ -1,0 +1,20 @@
+li.dropdown-delete {
+    cursor: pointer;
+    user-select: none;
+
+    a {
+        color: $brand-danger;
+        &:hover { color: $brand-danger; }
+    }
+
+    &.is-confirmed {
+        background-color: $brand-danger;
+        a {
+            color: white;
+            &:hover {
+              background-color: $brand-danger;
+              color: white;
+            }
+        }
+    }
+}
