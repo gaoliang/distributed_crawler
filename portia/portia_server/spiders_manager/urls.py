@@ -15,12 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from spiders_manager.views import *
+from views import *
 
 urlpatterns = [
   url(r'^admin/', admin.site.urls),
-  url(r'index/', create_spider),
-  url(r'spider_status', spider_status, name="spider_status"),
-  url(r'add_slaver', add_slaver, name='add_slaver'),
-  url(r'add_spider', add_spider, name='add_spider'),
+  url(r'^index', create_spider),
+  url(r'^spider_status', spider_status, name="spider_status"),
+  url(r'^add_slaver', add_slaver, name='add_slaver'),
+  url(r'^add_spider', add_spider, name='add_spider'),
 ]

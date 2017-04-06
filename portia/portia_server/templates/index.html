@@ -62,11 +62,9 @@
         </div>
         <table class="table">
           <div class="list-group">
-            <a class="list-group-item"><span class="label label-success">状态正常</span> 192.168.1.1</a>
-            <a class="list-group-item"><span class="label label-success">状态正常</span> 192.168.1.2</a>
-            <a class="list-group-item"><span class="label label-success">状态正常</span> 192.168.1.3</a>
-            <a class="list-group-item"><span class="label label-success">状态正常</span> 192.168.1.4</a>
-            <a class="list-group-item"><span class="label label-success">状态正常</span> 192.168.1.5</a>
+            {% for machine in machines %}
+            <a class="list-group-item"><span class="label label-success">状态正常</span> {{machine}}</a>
+            {% endfor %}
           </div>
         </table>
         <div class="panel-body">
@@ -104,7 +102,6 @@
           <h3 class="panel-title" id="status_title">状态监视</h3>
         </div>
         <div class="panel-body" id="status_content">
-
         </div>
       </div>
     </div>
@@ -196,6 +193,7 @@
     $("#slaver_form").ajaxSubmit(function (responseResult) {
       if (responseResult['success']) {
         alert('服务器添加成功')
+        window.location.reload();
       } else {
         alert(responseResult['reason'])
       }
@@ -219,12 +217,12 @@
   $("#save_spider").on('click', function () {
     $("#spider_form").ajaxSubmit(function (responseResult) {
       if (responseResult['success']) {
-        alert('服务器添加成功')
+        alert("爬虫项目添加成功")
+        window.location.reload();
       } else {
         alert(responseResult['reason'])
       }
     });
-
   });
 
 </script>
