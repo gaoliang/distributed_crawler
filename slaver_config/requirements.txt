@@ -59,3 +59,4 @@ tzlocal==1.3
 w3lib==1.17.0
 whitenoise==3.3.0
 zope.interface==4.3.3
+pyinotify
