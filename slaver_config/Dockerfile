@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y openssh-server \
 RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/run/sshd /var/log/supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN apt-get install python-pip -y
+RUN pip install --upgrade pip
 COPY requirements.txt /app/spider_cli/requirements.txt
 RUN pip install -r /app/spider_cli/requirements.txt
 
