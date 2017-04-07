@@ -18,17 +18,17 @@ def trans_file(ip, user, file, place, passwd=None):
   def printTotals(transferred, toBeTransferred):
     return "Transferred: {0}\tOut of: {1}".format(transferred, toBeTransferred)
 
-  try:
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(ip, username=user, password=passwd)
-    sftp = ssh.open_sftp()
-    sftp.putfo(file, place, callback=printTotals)
-    sftp.close()
-    ssh.close()
-
-  except Exception as e:
-    return ('*** Caught exception: %s: %s' % (e.__class__, e))
+  # try:
+  ssh = paramiko.SSHClient()
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+  ssh.connect(ip, username=user, password=passwd)
+  sftp = ssh.open_sftp()
+  sftp.putfo(file, place, callback=printTotals)
+  sftp.close()
+  ssh.close()
+  #
+  # except Exception as e:
+  #   return ('*** Caught exception: %s: %s' % (e.__class__, e))
 
 
 def run_cmd(ip, user, passwd, cmd):

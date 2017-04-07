@@ -55,6 +55,14 @@ install_deps(){
     apt-get update -q
     apt-get -y --no-install-recommends install \
             curl \
+            openssh-server supervisor \
+            openssl \
+            python-dev \
+            python-lxml \
+            build-essential libssl-dev libffi-dev \
+            libxml2-dev libxslt1-dev zlib1g-dev \
+            python-pip \
+            python3-dev \
             libxml2-dev \
             libxslt-dev \
             libgl1-mesa-dev \
@@ -106,8 +114,7 @@ cleanup() {
     rm -rf /var/lib/apt/lists/*
     apt-get remove --purge -y libxml2-dev \
                               libxslt-dev \
-                              libgl1-mesa-dev \
-                              python-dev
+                              libgl1-mesa-dev
     apt-get autoremove -y
     apt-get clean
     find / | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf

@@ -1,9 +1,12 @@
 <div class="col-md-3">
+  <input type="hidden" value="{{name}}" id="spider_name">
   部署到的服务器
   {% for machine in machines %}
-    {{machine}}
+  {{machine}}
   {% endfor %}
-  <button type="button" class="btn btn-info  btn-sm">部署到新服务器</button>
+  <button type="button" class="btn btn-info  btn-sm" id="deploy_spider_button" data-toggle="modal"
+          data-target="#deploy_spider">部署到新服务器
+  </button>
 </div>
 <div class="col-md-2">
   所有实例状态：
@@ -16,3 +19,57 @@
   暂无该项目的实例
   {% endif %}
 </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="deploy_spider" tabindex="-1" role="dialog" aria-labelledby="add_spider_label">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+          aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="deploy_spider_label">部署爬虫</h4>
+      </div>
+      <div class="modal-body">
+        <ul id="ips" class="list-group">
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="deploy_finish">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $("#deploy_spider_button").on('click', function () {
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'ajax_machines' %}",
+      data: {'name': $(event.target).text()},
+      success: function (rec) {
+        $("#ips").html("")
+        $.each(rec['ips'], function (index, element) {
+          $("#ips").append("<li class='list-group-item'>" + element + " <button class='btn btn-sm deploy'>部署到该服务器</button></li> ")
+        })
+      }
+    });
+  });
+
+  $("#deploy_spider").on('click', ".deploy", function (event) {
+    var name = $("#spider_name").val();
+    var ip = $(event.target).closest("li").text().split(" ")[0]
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'deploy_spider' %}",
+      data: {name: name, ip: ip},
+      success: function (rec) {
+        if(rec["success"]){
+            alert("部署成功！")
+        }
+      }
+    });
+  })
+</script>

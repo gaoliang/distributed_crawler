@@ -13,6 +13,8 @@ class MachineDoc(Document):
         'name': basestring,
         'ip': basestring,
         'status': basestring,
+        'password':basestring,
+        'username':basestring,
     }
     required_fields = ['ip']
 

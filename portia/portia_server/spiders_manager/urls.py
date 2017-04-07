@@ -23,4 +23,6 @@ urlpatterns = [
   url(r'^spider_status', spider_status, name="spider_status"),
   url(r'^add_slaver', add_slaver, name='add_slaver'),
   url(r'^add_spider', add_spider, name='add_spider'),
+  url(r'^ips', ajax_machines, name='ajax_machines'),
+  url(r'^deploy_spider', deploy_spider, name="deploy_spider"),
 ]

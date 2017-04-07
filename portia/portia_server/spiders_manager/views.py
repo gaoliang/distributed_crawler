@@ -2,11 +2,12 @@
 import bson
 from django.http import JsonResponse
 from django.shortcuts import render
-
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
 # from instance import instances_collection
+from io import BytesIO
+
 from models.instance import instances_collection
 from models.machine import machine_collection
 from models.spider import spider_collection
@@ -32,7 +33,8 @@ def spider_status(request):
   machines = spider_collection.find_one({'name': request.POST['name']})['machines']
   print machines
   instances = instances_collection.find({'name': request.POST['name']})
-  return render(request, "spider_status.html", context={'instances': instances, "machines": machines})
+  return render(request, "spider_status.html",
+                context={'instances': instances, "machines": machines, 'name': request.POST['name']})
 
 
 @csrf_exempt
@@ -43,6 +45,8 @@ def add_slaver(request):
     return JsonResponse({'success': False, 'reason': u'ip地址不合法'})
   machine_doc = machine_collection.MachineDoc()
   machine_doc['ip'] = request.POST['ip']
+  machine_doc['username'] = request.POST['username']
+  machine_doc['password'] = request.POST['password']
   machine_doc.save()
   return JsonResponse({'success': True})
   pass
@@ -59,18 +63,30 @@ def add_spider(request):
   except:
     return JsonResponse({'success': False, 'reason': "未上传爬虫文件"})
   spider['name'] = request.POST['name']
-  spider['machines'] = ['127.0.0.1', '192.168.168.168']
   spider.save()
-  print trans_file(ip="115.159.88.44", user="ubuntu", passwd="HIGHLIGHT0111", file=upload_file,
-                   place="test/sss.py")
-  print run_cmd(ip="115.159.88.44", user="ubuntu", passwd="HIGHLIGHT0111", cmd="ls")
   return JsonResponse({'success': True})
 
 
 def deploy_spider(request):
-  # trans_file()
-  pass
+  ip = request.POST['ip']
+  name = request.POST['name']
+  machine = machine_collection.MachineDoc.find_one({"ip": ip})
+  spider = spider_collection.SpiderDoc.find_one({'name': request.POST['name']})
+  try:
+    trans_file(ip, machine['username'], BytesIO(spider['file']), "test/{}.zip".format(name), machine['password'])
+  except Exception as e:
+    print ('*** Caught exception: %s: %s' % (e.__class__, e))
+    return JsonResponse({"success": False})
+  spider['machines'].append(ip)
+  spider.save()
+  return JsonResponse({"success": True})
 
 
 def run_instance(request):
   pass
+
+
+@csrf_exempt
+def ajax_machines(requests):
+  ips = [i["ip"] for i in machine_collection.find()]
+  return JsonResponse({"ips": ips})
