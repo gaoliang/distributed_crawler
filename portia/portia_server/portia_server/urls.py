@@ -7,4 +7,5 @@ urlpatterns = [
   url(r'^api/', include(urls, namespace='api')),
   url(r'^server_capabilities$', views.capabilities),
   url(r'^manage/', include("spiders_manager.urls")),
+  url(r'^supervisor/',include('suponoff.urls'))
 ]

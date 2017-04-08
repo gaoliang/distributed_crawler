@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'portia_server',
+    'suponoff',
 ]
 
 MIDDLEWARE = [
@@ -136,7 +137,7 @@ BLACKLIST_URLS = set()
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR,'templates'),os.path.join(BASE_DIR,'suponoff/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -148,3 +149,9 @@ TEMPLATES = [
         },
     },
 ]
+
+SUPERVISORS = [
+    '10.211.55.2',
+]
+
+SITE_ROOT = "http://127.0.0.1:8000/supervisor/"
