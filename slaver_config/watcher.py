@@ -3,10 +3,11 @@ from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE
 
 class EventHandler(ProcessEvent):
     def process_IN_CREATE(self, event):
+        os.system("supervisorctl update")
         print "Create file:%s." %os.path.join(event.path,event.name)
 
-        os.system('cp -rf %s /tmp/bak/'%(os.path.join(event.path,event.name)))
     def process_IN_DELETE(self, event):
+        os.system("supervisorctl update")
         print "Delete file:%s." %os.path.join(event.path,event.name)
 
     def process_IN_MODIFY(self, event):
