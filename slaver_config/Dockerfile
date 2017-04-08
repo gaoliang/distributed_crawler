@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y openssh-server \
                                          build-essential libssl-dev libffi-dev \
                                          libxml2-dev libxslt1-dev zlib1g-dev
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN apt-get install python-pip -y
+RUN pip install --upgrade pip
 COPY requirements.txt /app/spider_cli/requirements.txt
 COPY watcher.py /app/spider_cli/watcher.py
 RUN apt-get install python-pip -y
