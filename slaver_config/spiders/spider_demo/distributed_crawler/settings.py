@@ -39,10 +39,6 @@ MY_USER_AGENT = [
 
 ROBOTSTXT_OBEY = False
 
-SPIDER_MIDDLEWARES = {
-    'distributed_crawler.middlewares.InstanceStatusMiddleware.InstanceStatusMiddleware': 543,
-}
-
 # Enables scheduling storing requests queue in redis.
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 
