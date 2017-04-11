@@ -20,26 +20,20 @@ class MySplashMetaMiddlewares(object):
     def process_request(self, request, spider):
         request.meta['splash'] = {
             'args': {
-                # set rendering arguments here
+                #     # set rendering arguments here
                 'html': 1,
                 # 0表示不下载图片
                 'png': 0,
                 'wait': 0.5,
-                # 用于请求超时
-                'timeout': 180,
-                # 'resource_timeout ': 0,
-                'http_method': 'GET',
-                'url': request.url
-
-                # 'url' is prefilled from request url
-                # 'http_method' is set to 'POST' for POST requests
-                # 'body' is set to request body for POST requests
+                #     # 'resource_timeout ': 0,
+                'url': request.url,
+                'http_method': request.method,
             },
-
-            # optional parameters
-            # 'splash_url': <>,      # optional; overrides SPLASH_URL
-            'slot_policy': scrapy_splash.SlotPolicy.PER_DOMAIN,
-            'splash_headers': {},  # optional; a dict with headers sent to Splash
+            # # optional parameters
+            'endpoint': 'render.html',
+            # # 'splash_url': <>,      # optional; overrides SPLASH_URL
+            # 'slot_policy': scrapy_splash.SlotPolicy.PER_DOMAIN,
+            # 'splash_headers': {},  # optional; a dict with headers sent to Splash
             'dont_process_response': True,  # optional, default is False
             'dont_send_headers': True,  # optional, default is False
             'magic_response': False,  # optional, default is True

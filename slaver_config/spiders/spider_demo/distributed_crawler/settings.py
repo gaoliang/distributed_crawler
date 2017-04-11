@@ -38,7 +38,6 @@ MY_USER_AGENT = [
 ]
 
 ROBOTSTXT_OBEY = False
-
 # Enables scheduling storing requests queue in redis.
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 
@@ -66,4 +65,5 @@ DEFAULT_REQUEST_HEADERS = {
     'Accept-Encoding': 'gzip, deflate',
 }
 
+SPLASH_LOG_400 = True
 SPLASH_URL = 'http://127.0.0.1:8050'

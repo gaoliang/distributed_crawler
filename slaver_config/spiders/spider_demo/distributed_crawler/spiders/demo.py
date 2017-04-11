@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+import codecs
+
 import scrapy
 import re
 
+
+
 from scrapy import Request
-from scrapy_splash import SplashRequest as Request
 
 
 class QuotesSpider(scrapy.Spider):
