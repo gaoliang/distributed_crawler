@@ -1,9 +1,10 @@
 FROM ubuntu:16.04
 
 WORKDIR /app/spider_cli
+RUN echo "root:root" | chpasswd
 RUN mkdir /app/spider_cli/spiders
 RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/cn.archive.ubuntu.com\/ubuntu\//g' /etc/apt/sources.list
-RUN mkdir -p  /var/run/sshd /var/log/supervisor
+RUN mkdir -p  /var/run/sshd /var/log/supervisor /app/spider_cli/templates
 RUN apt-get update && apt-get install -y openssh-server \
                                          supervisor \
                                          openssl \
@@ -14,11 +15,12 @@ RUN apt-get update && apt-get install -y openssh-server \
 RUN apt-get install python-pip -y
 RUN pip install --upgrade pip
 COPY requirements.txt /app/spider_cli/requirements.txt
-COPY spider_base_server.py /app/spider_cli/watcher.py
-COPY watcher.py /app/spider_cli/watcher.py
+COPY spider_base_server.py /app/spider_cli/spider_base_server.py
+COPY templates/upload.html /app/spider_cli/templates/upload.html
+COPY supervisor_config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN apt-get install python-pip -y
 RUN pip install -r /app/spider_cli/requirements.txt -i https://mirrors.ustc.edu.cn/pypi/web/simple
 
 
-EXPOSE 22 80 9001
+EXPOSE 22 80 9001 8080
 CMD ["/usr/bin/supervisord"]
