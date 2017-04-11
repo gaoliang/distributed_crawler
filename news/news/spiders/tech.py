@@ -18,7 +18,7 @@ class TechSpider(CrawlSpider):
      item = NewsItem()
      item['url'] = response.url
      #item['desc'] = ''.join(content)
-     ext = Extractor(url=response.url,blockSize=5, image=False)
+     ext = Extractor(response,blockSize=5, image=False)
      item['desc'] = ext.getContext()
      items.append(item)
      return items
