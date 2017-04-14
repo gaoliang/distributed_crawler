@@ -121,4 +121,4 @@ SUPERVISORS = [
     {'hostname': 'localhost', 'port': 9001},
     {'hostname': 'localhost', 'port': 9002},
 ]
-SITE_ROOT = "localhost:8080"
+SITE_ROOT = "http://127.0.0.1:8000/supervisor"

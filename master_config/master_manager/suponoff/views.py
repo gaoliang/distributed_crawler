@@ -30,7 +30,7 @@ LOG = logging.getLogger(__name__)
 
 def _get_supervisor(hostname, port=9001):
     url = "http://{}:{}".format(hostname, port)
-    supervisor = TimeoutServerProxy(url, verbose=False,timeout=1)
+    supervisor = TimeoutServerProxy(url, verbose=False,timeout=10)
     return supervisor
 
 
