@@ -73,7 +73,8 @@ def _get_server_data(hostname, metadata, port=9001):
 def _get_data(metadata):
     # hostname -> group -> process
     services_by_host = OrderedDict()
-    servers = settings.SUPERVISORS
+    # servers = settings.SUPERVISORS
+    servers = machine_collection.find()
     with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
         for server in servers:
             hostname = server['hostname']
