@@ -16,14 +16,16 @@ scrapy_conf_templates = """[program:{0}]
 directory=/app/spider_cli/spiders/{0}
 command=scrapy crawl {0}
 stdout_logfile=/var/log/supervisor/{0}_stdout.log
-stderr_logfile=/var/log/supervisor/{0}_error.log
+redirect_stderr=true
+autostart=false
 """
 portia_conf_tempaltes = """
 [program:{0}]
 directory=/app/spider_cli/spiders
 command=portiacrawl {0} {0}
 stdout_logfile=/var/log/supervisor/{0}_stdout.log
-stderr_logfile=/var/log/supervisor/{0}_error.log
+redirect_stderr=true
+autostart=false
 """
 
 

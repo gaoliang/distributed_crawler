@@ -10,9 +10,9 @@ import xmlrpclib
 import concurrent.futures
 from spiders_manager.models.machine import machine_collection
 
-try: # django>=1.8
+try:  # django>=1.8
     from django.template.context_processors import csrf
-except ImportError: # django==1.7
+except ImportError:  # django==1.7
     from django.core.context_processors import csrf
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render_to_response
@@ -26,15 +26,14 @@ from pathlib import Path
 LOG = logging.getLogger(__name__)
 
 
-def _get_supervisor(hostname):
-    url = "http://{}:9001".format(hostname)
+def _get_supervisor(hostname, port=9001):
+    url = "http://{}:{}".format(hostname, port)
     supervisor = xmlrpclib.ServerProxy(url, verbose=False)
     return supervisor
 
 
-
-def _get_server_data(hostname, metadata):
-    supervisor = _get_supervisor(hostname)
+def _get_server_data(hostname, metadata, port=9001):
+    supervisor = _get_supervisor(hostname, port)
     try:
         processes = supervisor.supervisor.getAllProcessInfo()
         server = {}
@@ -74,15 +73,17 @@ def _get_server_data(hostname, metadata):
 def _get_data(metadata):
     # hostname -> group -> process
     services_by_host = OrderedDict()
-    machine_collection
-    servers = sorted(settings.SUPERVISORS)
+    servers = settings.SUPERVISORS
     with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-        for hostname in servers:
-            server_data = executor.submit(_get_server_data, hostname, metadata)
-            services_by_host[hostname] = server_data
-        for hostname in servers:
-            print services_by_host[hostname]
-            services_by_host[hostname] = services_by_host[hostname].result()
+        for server in servers:
+            hostname = server['hostname']
+            port = server['port']
+            server_data = executor.submit(_get_server_data, hostname, metadata, port)
+            services_by_host[hostname + "_" + str(port)] = server_data
+        for server in servers:
+            hostname = server['hostname']
+            port = server['port']
+            services_by_host[hostname + "_" + str(port)] = services_by_host[hostname + "_" + str(port)].result()
     return services_by_host
 
 
@@ -132,7 +133,7 @@ def home(request, template_name="suponoff/index.html"):
 
 def action(request):
     server = request.POST['server']
-    supervisor = _get_supervisor(server)
+    supervisor = _get_supervisor(server.split('_')[0], server.split('_')[1])
     try:
         if 'action_start_all' in request.POST:
             supervisor.supervisor.startAllProcesses()
@@ -165,7 +166,7 @@ def get_program_logs(request):
     full_name = "{}:{}".format(request.GET['group'],
                                request.GET['program'])
     if stream == 'stdout':
-        supervisor = _get_supervisor(request.GET['server'])
+        supervisor = _get_supervisor(request.GET['server'].split('_')[0],request.GET['server'].split('_')[1])
         try:
             logs, _offeset, _overflow = \
                 supervisor.supervisor.tailProcessStdoutLog(
@@ -173,7 +174,7 @@ def get_program_logs(request):
         finally:
             supervisor("close")()
     elif stream == 'stderr':
-        supervisor = _get_supervisor(request.GET['server'])
+        supervisor = _get_supervisor(request.GET['server'].split('_')[0],request.GET['server'].split('_')[1])
         try:
             logs, _offeset, _overflow = \
                 supervisor.supervisor.tailProcessStderrLog(
