@@ -2,6 +2,7 @@
 import json
 import logging
 import re
+import socket
 from collections import defaultdict, OrderedDict
 
 import configparser
@@ -9,6 +10,7 @@ import xmlrpclib
 
 import concurrent.futures
 from spiders_manager.models.machine import machine_collection
+from net_utils import TimeoutServerProxy
 
 try:  # django>=1.8
     from django.template.context_processors import csrf
@@ -28,7 +30,7 @@ LOG = logging.getLogger(__name__)
 
 def _get_supervisor(hostname, port=9001):
     url = "http://{}:{}".format(hostname, port)
-    supervisor = xmlrpclib.ServerProxy(url, verbose=False)
+    supervisor = TimeoutServerProxy(url, verbose=False,timeout=1)
     return supervisor
 
 
@@ -74,17 +76,23 @@ def _get_data(metadata):
     # hostname -> group -> process
     services_by_host = OrderedDict()
     # servers = settings.SUPERVISORS
-    servers = machine_collection.find()
+    servers = list(machine_collection.find())
     with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
         for server in servers:
             hostname = server['hostname']
             port = server['port']
-            server_data = executor.submit(_get_server_data, hostname, metadata, port)
-            services_by_host[hostname + "_" + str(port)] = server_data
+            try:
+                server_data = executor.submit(_get_server_data, hostname, metadata, port)
+                services_by_host[hostname + "_" + str(port)] = server_data
+            except Exception as e:
+                print "connect error on {}".format(server)
         for server in servers:
             hostname = server['hostname']
             port = server['port']
-            services_by_host[hostname + "_" + str(port)] = services_by_host[hostname + "_" + str(port)].result()
+            try:
+                services_by_host[hostname + "_" + str(port)] = services_by_host[hostname + "_" + str(port)].result()
+            except:
+                del services_by_host[hostname + "_" + str(port)]
     return services_by_host
 
 

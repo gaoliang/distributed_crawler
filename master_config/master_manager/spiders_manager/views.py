@@ -26,7 +26,7 @@ def ip_check(ip):
 
 def create_spider(request):
     spiders = [i["name"] for i in spider_collection.find()]
-    machine = ["{}:{}".format(i["hostname"],i['port']) for i in machine_collection.find()]
+    machine = ["{}:{}".format(i["hostname"], i['port']) for i in machine_collection.find()]
     return render(request, 'index.html', context={'spiders': spiders, 'machines': machine})
 
 
