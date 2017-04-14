@@ -1,10 +1,10 @@
 """
 this is the init file for automatically set spiders settings from a conf file
 """
-import os
+
+import ConfigParser
 
 import settings
-import ConfigParser
 
 config = ConfigParser.RawConfigParser(allow_no_value=True)
 config.readfp(open('custom_settings.conf'))
