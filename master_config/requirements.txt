@@ -1,0 +1,12 @@
+appdirs==1.4.3
+configparser==3.5.0
+Django==1.11
+futures==3.0.5
+mongokit==0.9.1.1
+packaging==16.8
+pathlib==1.0.1
+pymongo==2.8
+pyparsing==2.2.0
+pytz==2017.2
+requests==2.13.0
+six==1.10.0
