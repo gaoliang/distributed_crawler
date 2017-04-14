@@ -121,12 +121,12 @@
       <div class="modal-body">
         <form id="slaver_form" method="post" action="{% url 'add_slaver' %}">
           <div class="form-group">
-            <label for="ip">服务器ip地址</label>
-            <input type="text" class="form-control" id="ip" placeholder="IP" name="ip">
+            <label for="hostname">服务器ip地址</label>
+            <input type="text" class="form-control" id="hostname" placeholder="IP" name="hostname">
           </div>
 
           <div class="form-group">
-            <label for="ip">服务器端口</label>
+            <label for="port">服务器端口</label>
             <input type="number" class="form-control" id="port" placeholder="PORT" name="port">
           </div>
           注意，您需要在服务器上先部署基础服务， 相关部署流程请访问xxx

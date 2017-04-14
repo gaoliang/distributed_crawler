@@ -10,13 +10,11 @@ class MachineDoc(Document):
     __database__ = DATABASE_NAME
     __collection__ = 'machines'
     structure = {
-        'name': basestring,
-        'ip': basestring,
+        'hostname': basestring,
+        'port': basestring,
         'status': basestring,
-        'password':basestring,
-        'username':basestring,
     }
-    required_fields = ['ip']
+    required_fields = ['hostname']
 
 
 machine_collection = connection[DATABASE_NAME]['machines']

@@ -26,7 +26,7 @@ def ip_check(ip):
 
 def create_spider(request):
     spiders = [i["name"] for i in spider_collection.find()]
-    machine = [i["ip"] for i in machine_collection.find()]
+    machine = ["{}:{}".format(i["hostname"],i['port']) for i in machine_collection.find()]
     return render(request, 'index.html', context={'spiders': spiders, 'machines': machine})
 
 
@@ -41,14 +41,9 @@ def spider_status(request):
 
 @csrf_exempt
 def add_slaver(request):
-    if machine_collection.find_one({"ip": request.POST['ip']}):
-        return JsonResponse({'success': False, 'reason': u'该服务器已存在'})
-    if not ip_check(request.POST['ip']):
-        return JsonResponse({'success': False, 'reason': u'ip地址不合法'})
     machine_doc = machine_collection.MachineDoc()
-    machine_doc['ip'] = request.POST['ip']
-    machine_doc['username'] = request.POST['username']
-    machine_doc['password'] = request.POST['password']
+    machine_doc['hostname'] = request.POST['hostname']
+    machine_doc['port'] = request.POST['port']
     machine_doc.save()
     return JsonResponse({'success': True})
     pass

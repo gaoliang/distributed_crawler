@@ -119,6 +119,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 SUPERVISORS = [
     {'hostname': 'localhost', 'port': 9001},
-    # {'hostname': 'localhost', 'port': 9002},
+    {'hostname': 'localhost', 'port': 9002},
 ]
 SITE_ROOT = "localhost:8080"
