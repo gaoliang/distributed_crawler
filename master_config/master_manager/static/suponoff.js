@@ -384,7 +384,7 @@ function open_stream(button, stream) {
                     stream: stream,
                     program: program,
                     group: group,
-                    server: server.repalce(/\./g,'\\.'),
+                    server: server.replace(/\./g,'\\.'),
                 }))
 
         $('#show-logs-dialog').modal()
