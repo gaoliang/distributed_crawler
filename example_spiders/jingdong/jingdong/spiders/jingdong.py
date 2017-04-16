@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import scrapy
 
-from jingdong.items import JingdongItem
+from ..items import JingdongItem
+
 
 class JdSpider(scrapy.Spider):
     name = "jingdong"
