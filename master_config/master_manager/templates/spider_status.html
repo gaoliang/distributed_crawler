@@ -1,23 +1,17 @@
 <div class="col-md-3">
   <input type="hidden" value="{{name}}" id="spider_name">
-  部署到的服务器
+  部署到的实例
   {% for machine in machines %}
   {{machine}}
   {% endfor %}
   <button type="button" class="btn btn-info  btn-sm" id="deploy_spider_button" data-toggle="modal"
-          data-target="#deploy_spider">部署到新服务器
+          data-target="#deploy_spider">部署到新实例
   </button>
 </div>
-<div class="col-md-2">
-  所有实例状态：
-  {% if instances %}
-  {% for instance in instances %}
-  {{ instance.machine }}
-  {{ instance.status|safe }}
-  {% endfor %}
-  {% else %}
-  暂无该项目的实例
-  {% endif %}
+<div class="col-md-9">
+  <button class="btn btn-success btn-block" id="start-all">在所有实例上运行爬虫</button>
+  <button class="btn btn-warning btn-block" id="stop-all">在所有实例上结束爬虫</button>
+  <button class="btn btn-danger btn-block" id="del-all">在所有实例上删除此爬虫</button>
 </div>
 
 
@@ -68,8 +62,34 @@
       success: function (rec) {
         if(rec["success"]){
             alert("部署成功！")
+            window.location.reload();
+        }else{
+            alert("部署失败！可能已在该平台部署。")
         }
       }
     });
+  })
+  
+  $("#start-all").on('click',function (event) {
+      start_group_on_all($("#status_title").text().substring(0,$("#status_title").text().length-2))
+  })
+  $("#stop-all").on('click',function (event) {
+      stop_group_on_all($("#status_title").text().substring(0,$("#status_title").text().length-2))
+  })
+  $("#del-all").on('click',function (event) {
+      $.ajax({
+      type: 'POST',
+      url: "{% url 'del_deployed_spider' %}",
+      data: {name: $("#status_title").text().substring(0,$("#status_title").text().length-2)},
+      success: function (rec) {
+        if(rec["success"]){
+            alert("删除成功！")
+            window.location.reload();
+        }else{
+            alert("删除失败！")
+        }
+      }
+    });
+
   })
 </script>

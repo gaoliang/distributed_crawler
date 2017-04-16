@@ -26,6 +26,7 @@ LOG = logging.getLogger(__name__)
 def index(request):
     """爬虫管理主界面"""
     spiders = [i["name"] for i in spider_collection.find()]
+
     machine = ["{}:{}".format(i["hostname"], i['port']) for i in machine_collection.find()]
     context = get_index_template_data()
     context['spiders'] = spiders
@@ -37,10 +38,9 @@ def index(request):
 def spider_status(request):
     """爬虫状态ajax请求"""
     machines = spider_collection.find_one({'name': request.POST['name']})['machines']
-    print machines
     instances = instances_collection.find({'name': request.POST['name']})
     return render(request, "spider_status.html",
-                  context={'instances': instances, "machines": machines, 'name': request.POST['name']})
+                  context={"machines": machines, 'name': request.POST['name']})
 
 
 @csrf_exempt
@@ -61,8 +61,8 @@ def add_spider(request):
     添加新的爬虫项目到系统的ajax处理函数
     """
     upload_file = request.FILES['zip_file'].file
-    filename =  request.FILES['zip_file'].name
-    if spider_collection.find_one({'name': request.POST['name']}):
+    filename = request.FILES['zip_file'].name
+    if spider_collection.find_one({'name': filename.split('.')[0]}):
         return JsonResponse({"success": False, 'reason': "爬虫名字已存在"})
     spider = spider_collection.SpiderDoc()
     spider['filename'] = filename
@@ -70,7 +70,7 @@ def add_spider(request):
         spider['file'] = bson.binary.Binary(upload_file.getvalue())
     except:
         return JsonResponse({'success': False, 'reason': "未上传爬虫文件"})
-    spider['name'] = request.POST['name']
+    spider['name'] = filename.split('.')[0]
     spider.save()
     print spider
     return JsonResponse({'success': True})
@@ -86,9 +86,8 @@ def deploy_spider(request):
     port = ip.split(':')[1]
     spider = spider_collection.SpiderDoc.find_one({'name': request.POST['name']})
     trans_file(hostname, port, filename=spider['filename'], file=BytesIO(spider['file']))
-    # except Exception as e:
-    #     print ('*** Caught exception: %s: %s' % (e.__class__, e))
-    #     return JsonResponse({"success": False})
+    if ip in spider['machines']:
+        return JsonResponse({"success":False})
     spider['machines'].append(ip)
     spider.save()
     return JsonResponse({"success": True})
@@ -107,7 +106,7 @@ def ajax_machines(request):
     return JsonResponse({"ips": hostnames})
 
 
-def trans_file(hostname, port, file, filename,spider_type='scrapy'):
+def trans_file(hostname, port, file, filename, spider_type='scrapy'):
     """
     传输爬虫文件到服务器
     :param hostname: 服务器地址
@@ -360,3 +359,15 @@ def _get_metadata_conf():
                 taggroups[taggroup_name].label = label
 
     return mappings, tags_config, taggroups
+
+
+def del_deployed_spider(request):
+    name = request.POST['name']
+    machines = spider_collection.find_one({"name": name})['machines']
+    for machine in machines:
+        r = requests.post("http://{}/api/delete".format(machine), data={'name': name})
+        print r.text
+    spider = spider_collection.SpiderDoc.find_one({"name": name})
+    spider['machines'] = []
+    spider.save()
+    return JsonResponse({'success': True})

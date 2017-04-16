@@ -79,5 +79,17 @@ def api_upload():
         return jsonify({"success": False, "errmsg": "上传失败"})
 
 
+# 上传文件
+@app.route('/api/delete', methods=['POST'], strict_slashes=False)
+def delete():
+    name = request.form['name']
+    try:
+        os.remove(os.path.join(config_dir, name + '.conf'))
+        os.system("supervisorctl update")
+        return jsonify({"success": True})
+    except:
+        return jsonify({'success': False})
+
+
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=8080)

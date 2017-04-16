@@ -148,7 +148,6 @@ function update_data_received(data) {
             }
             var group_div = $(_.template('div.server#server-<%= server %> div.group#group-<%= group %>',
                 {server: server_name.replace(/\./g, '\\.'), group: group_name}))
-            console.debug(group_div)
             group_div.find('>h4>span.group-name').removeClass('bg-success bg-danger bg-info bg-warning').addClass(
                 ALERT_LEVEL_CLASSES[group_alert_level])
             group_div.find('.num-processes-running').text(group_num_processes_running.toString())
@@ -572,3 +571,17 @@ window.on_show_no_tags_clicked = function () {
     filter_by_tags()
 }
 
+
+function start_group_on_all(spider_name) {
+    $(".group[data-group-name='"+spider_name+"']").each(function (index,element) {
+       _group_action($(element).find('.btn-primary')[0],'action_start')
+    })
+}
+
+
+
+function stop_group_on_all(spider_name) {
+    $(".group[data-group-name='"+spider_name+"']").each(function (index,element) {
+        _group_action($(element).find('.btn-primary')[2],'action_stop')
+    })
+}
