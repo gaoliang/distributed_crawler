@@ -19,10 +19,16 @@ from views import *
 
 urlpatterns = [
   url(r'^admin/', admin.site.urls),
-  url(r'^index', create_spider),
+  url(r'^$', create_spider),
   url(r'^spider_status', spider_status, name="spider_status"),
   url(r'^add_slaver', add_slaver, name='add_slaver'),
   url(r'^add_spider', add_spider, name='add_spider'),
   url(r'^ips', ajax_machines, name='ajax_machines'),
   url(r'^deploy_spider', deploy_spider, name="deploy_spider"),
+  url(r'^$', home, {'template_name': 'suponoff/index.html'},
+      name='suponoff_home'),
+  url(r'^action$', action, name='suponoff_action'),
+  url(r'^data$', get_data, name='suponoff_data'),
+  url(r'^data/program-logs$', get_program_logs,
+      name='suponoff_program_logs'),
 ]
