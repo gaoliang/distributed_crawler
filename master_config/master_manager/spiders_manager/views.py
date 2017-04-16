@@ -87,7 +87,7 @@ def deploy_spider(request):
     spider = spider_collection.SpiderDoc.find_one({'name': request.POST['name']})
     trans_file(hostname, port, filename=spider['filename'], file=BytesIO(spider['file']))
     if ip in spider['machines']:
-        return JsonResponse({"success":False})
+        return JsonResponse({"success": False})
     spider['machines'].append(ip)
     spider.save()
     return JsonResponse({"success": True})
@@ -370,4 +370,14 @@ def del_deployed_spider(request):
     spider = spider_collection.SpiderDoc.find_one({"name": name})
     spider['machines'] = []
     spider.save()
+    return JsonResponse({'success': True})
+
+
+def del_spider(request):
+    name = request.POST['name']
+    machines = spider_collection.find_one({"name": name})['machines']
+    for machine in machines:
+        r = requests.post("http://{}/api/delete".format(machine), data={'name': name})
+        print r.text
+    spider_collection.remove({"name": name})
     return JsonResponse({'success': True})

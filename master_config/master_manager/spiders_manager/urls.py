@@ -29,5 +29,6 @@ urlpatterns = [
   url(r'^data$', get_data, name='suponoff_data'),
   url(r'^data/program-logs$', get_program_logs,
       name='suponoff_program_logs'),
-  url(r'^del_deployed_spider',del_deployed_spider,name='del_deployed_spider')
+  url(r'^del_deployed_spider',del_deployed_spider,name='del_deployed_spider'),
+  url(r'^del_spider',del_spider,name="del_spider"),
 ]

@@ -4,8 +4,11 @@
   {% for machine in machines %}
   {{machine}}
   {% endfor %}
-  <button type="button" class="btn btn-info  btn-sm" id="deploy_spider_button" data-toggle="modal"
+  <button type="button" class="btn btn-info  btn-sm btn-block" id="deploy_spider_button" data-toggle="modal"
           data-target="#deploy_spider">部署到新实例
+  </button>
+  <br>
+  <button type="button" class="btn btn-danger  btn-sm btn-block" id="del_spider_button">删除该爬虫
   </button>
 </div>
 <div class="col-md-9">
@@ -80,6 +83,23 @@
       $.ajax({
       type: 'POST',
       url: "{% url 'del_deployed_spider' %}",
+      data: {name: $("#status_title").text().substring(0,$("#status_title").text().length-2)},
+      success: function (rec) {
+        if(rec["success"]){
+            alert("删除成功！")
+            window.location.reload();
+        }else{
+            alert("删除失败！")
+        }
+      }
+    });
+
+  })
+
+   $("#del_spider_button").on('click',function (event) {
+      $.ajax({
+      type: 'POST',
+      url: "{% url 'del_spider' %}",
       data: {name: $("#status_title").text().substring(0,$("#status_title").text().length-2)},
       success: function (rec) {
         if(rec["success"]){
