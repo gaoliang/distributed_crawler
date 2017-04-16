@@ -79,14 +79,14 @@ def deploy_spider(request):
     部署爬虫到指定服务器的ajax请求处理函数
     """
     ip = request.POST['ip']
-    name = request.POST['name']
-    machine = machine_collection.MachineDoc.find_one({"ip": ip})
+    hostname = ip.split(':')[0]
+    port = ip.split(':')[1]
     spider = spider_collection.SpiderDoc.find_one({'name': request.POST['name']})
-    try:
-        trans_file(ip, machine['username'], BytesIO(spider['file']), "test/{}.zip".format(name), machine['password'])
-    except Exception as e:
-        print ('*** Caught exception: %s: %s' % (e.__class__, e))
-        return JsonResponse({"success": False})
+    # try:
+    trans_file(hostname, port, spider['file'])
+    # except Exception as e:
+    #     print ('*** Caught exception: %s: %s' % (e.__class__, e))
+    #     return JsonResponse({"success": False})
     spider['machines'].append(ip)
     spider.save()
     return JsonResponse({"success": True})
@@ -101,8 +101,8 @@ def ajax_machines(requests):
     """
     ajax获取可用的服务器列表 
     """
-    ips = [i["ip"] for i in machine_collection.find()]
-    return JsonResponse({"ips": ips})
+    hostnames = ["{}:{}".format(i["hostname"], str(i['port'])) for i in machine_collection.find()]
+    return JsonResponse({"ips": hostnames})
 
 
 def trans_file(hostname, port, file, spider_type='scrapy'):
@@ -116,6 +116,7 @@ def trans_file(hostname, port, file, spider_type='scrapy'):
     """
     files = {'file': file}
     r = requests.post("http://{}:{}".format(hostname, port), files=files, data={'type': spider_type})
+    print r.text
     result = json.loads(r.text)
     print result
 
