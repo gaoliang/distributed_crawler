@@ -61,15 +61,18 @@ def add_spider(request):
     添加新的爬虫项目到系统的ajax处理函数
     """
     upload_file = request.FILES['zip_file'].file
+    filename =  request.FILES['zip_file'].name
     if spider_collection.find_one({'name': request.POST['name']}):
         return JsonResponse({"success": False, 'reason': "爬虫名字已存在"})
     spider = spider_collection.SpiderDoc()
+    spider['filename'] = filename
     try:
         spider['file'] = bson.binary.Binary(upload_file.getvalue())
     except:
         return JsonResponse({'success': False, 'reason': "未上传爬虫文件"})
     spider['name'] = request.POST['name']
     spider.save()
+    print spider
     return JsonResponse({'success': True})
 
 
@@ -82,8 +85,7 @@ def deploy_spider(request):
     hostname = ip.split(':')[0]
     port = ip.split(':')[1]
     spider = spider_collection.SpiderDoc.find_one({'name': request.POST['name']})
-    # try:
-    trans_file(hostname, port, spider['file'])
+    trans_file(hostname, port, filename=spider['filename'], file=BytesIO(spider['file']))
     # except Exception as e:
     #     print ('*** Caught exception: %s: %s' % (e.__class__, e))
     #     return JsonResponse({"success": False})
@@ -97,7 +99,7 @@ def run_instance(request):
 
 
 @csrf_exempt
-def ajax_machines(requests):
+def ajax_machines(request):
     """
     ajax获取可用的服务器列表 
     """
@@ -105,7 +107,7 @@ def ajax_machines(requests):
     return JsonResponse({"ips": hostnames})
 
 
-def trans_file(hostname, port, file, spider_type='scrapy'):
+def trans_file(hostname, port, file, filename,spider_type='scrapy'):
     """
     传输爬虫文件到服务器
     :param hostname: 服务器地址
@@ -114,9 +116,8 @@ def trans_file(hostname, port, file, spider_type='scrapy'):
     :param spider_type: 爬虫类型，两个值可选 "scrapy":scrapy原生爬虫，"portia":由portia生成的爬虫
     :return: 返回json，格式为 {"success":True or False}
     """
-    files = {'file': file}
-    r = requests.post("http://{}:{}".format(hostname, port), files=files, data={'type': spider_type})
-    print r.text
+    files = {'file': (filename, file)}
+    r = requests.post("http://{}:{}/api/upload".format(hostname, port), files=files, data={'type': spider_type})
     result = json.loads(r.text)
     print result
 
