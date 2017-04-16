@@ -19,5 +19,4 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^manage/', include("spiders_manager.urls")),
-    url(r'^supervisor/', include('suponoff.urls'))
 ]

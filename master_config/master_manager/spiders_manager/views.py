@@ -5,42 +5,26 @@ import re
 import configparser
 import bson
 import requests
-from django.http import JsonResponse
+import concurrent.futures
 from django.shortcuts import render
 from collections import defaultdict, OrderedDict
 from django.views.decorators.csrf import csrf_exempt
 from io import BytesIO
-
 from models.instance import instances_collection
 from models.machine import machine_collection
 from models.spider import spider_collection
-import concurrent.futures
 from net_utils import TimeoutServerProxy
-
-try:  # django>=1.8
-    from django.template.context_processors import csrf
-except ImportError:  # django==1.7
-    from django.core.context_processors import csrf
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect, render_to_response
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.shortcuts import redirect
 from django.conf import settings
 from pathlib import Path
-
 
 LOG = logging.getLogger(__name__)
 
 
-
-def ip_check(ip):
-    """
-    检查ip地址合法性
-    """
-    q = ip.split('.')
-    return len(q) == 4 and len(filter(lambda x: x >= 0 and x <= 255, map(int, filter(lambda x: x.isdigit(), q)))) == 4
-
 @csrf_exempt
-def create_spider(request):
+def index(request):
+    """爬虫管理主界面"""
     spiders = [i["name"] for i in spider_collection.find()]
     machine = ["{}:{}".format(i["hostname"], i['port']) for i in machine_collection.find()]
     context = get_index_template_data()
@@ -51,6 +35,7 @@ def create_spider(request):
 
 @csrf_exempt
 def spider_status(request):
+    """爬虫状态ajax请求"""
     machines = spider_collection.find_one({'name': request.POST['name']})['machines']
     print machines
     instances = instances_collection.find({'name': request.POST['name']})
@@ -60,16 +45,21 @@ def spider_status(request):
 
 @csrf_exempt
 def add_slaver(request):
+    """
+    添加新的slaver服务器的ajax请求处理函数
+    """
     machine_doc = machine_collection.MachineDoc()
     machine_doc['hostname'] = request.POST['hostname']
     machine_doc['port'] = request.POST['port']
     machine_doc.save()
     return JsonResponse({'success': True})
-    pass
 
 
 @csrf_exempt
 def add_spider(request):
+    """
+    添加新的爬虫项目到系统的ajax处理函数
+    """
     upload_file = request.FILES['zip_file'].file
     if spider_collection.find_one({'name': request.POST['name']}):
         return JsonResponse({"success": False, 'reason': "爬虫名字已存在"})
@@ -82,8 +72,12 @@ def add_spider(request):
     spider.save()
     return JsonResponse({'success': True})
 
+
 @csrf_exempt
 def deploy_spider(request):
+    """
+    部署爬虫到指定服务器的ajax请求处理函数
+    """
     ip = request.POST['ip']
     name = request.POST['name']
     machine = machine_collection.MachineDoc.find_one({"ip": ip})
@@ -104,23 +98,48 @@ def run_instance(request):
 
 @csrf_exempt
 def ajax_machines(requests):
+    """
+    ajax获取可用的服务器列表 
+    """
     ips = [i["ip"] for i in machine_collection.find()]
     return JsonResponse({"ips": ips})
 
 
-def trans_file(ip, port, file,spider_type='scrapy'):
+def trans_file(hostname, port, file, spider_type='scrapy'):
+    """
+    传输爬虫文件到服务器
+    :param hostname: 服务器地址
+    :param port: 服务器端口号
+    :param file: 文件，以zip格式压缩打包，注意根目录下一定有scrapy.cfg文件。
+    :param spider_type: 爬虫类型，两个值可选 "scrapy":scrapy原生爬虫，"portia":由portia生成的爬虫
+    :return: 返回json，格式为 {"success":True or False}
+    """
     files = {'file': file}
-    r = requests.post("http://{}:{}".format(ip, port), files=files, data={'type': spider_type})
+    r = requests.post("http://{}:{}".format(hostname, port), files=files, data={'type': spider_type})
     result = json.loads(r.text)
     print result
 
 
 def _get_supervisor(hostname, port=9001):
+    """
+    获取指定hostname的ServerProxy对象
+    :param hostname: 服务器地址
+    :param port: 服务器端口号
+    :return: 
+    """
     url = "http://{}:{}".format(hostname, port)
-    supervisor = TimeoutServerProxy(url, verbose=False,timeout=10)
+    supervisor = TimeoutServerProxy(url, verbose=False, timeout=10)
     return supervisor
 
+
 def _get_server_data(hostname, metadata, port=9001):
+    """
+    获取服务器的supervisor信息
+    :param hostname: 服务器地址
+    :param metadata: 元数据
+    :param port: 端口号
+    :return: 包含服务器信息的字典
+    """
     supervisor = _get_supervisor(hostname, port)
     try:
         processes = supervisor.supervisor.getAllProcessInfo()
@@ -157,6 +176,7 @@ def _get_server_data(hostname, metadata, port=9001):
         supervisor("close")()
     return server
 
+
 def _get_data(metadata):
     # hostname -> group -> process
     services_by_host = OrderedDict()
@@ -180,13 +200,20 @@ def _get_data(metadata):
                 del services_by_host[hostname + "_" + str(port)]
     return services_by_host
 
+
 @csrf_exempt
 def get_data(request):
+    """
+    处理获取服务器信息的请求
+    """
     data = _get_data([])
     return JsonResponse(data)
 
 
 def get_index_template_data():
+    """
+    获取主页的context数据。
+    """
     metadata, tags_config, taggroups_dict = _get_metadata_conf()
     services_by_host = _get_data(metadata)
 
@@ -218,14 +245,10 @@ def get_index_template_data():
 
 
 @csrf_exempt
-def home(request, template_name="suponoff/index.html"):
-    context = get_index_template_data()
-    context.update(csrf(request))
-    resp = render_to_response(template_name, context)
-    return resp
-
-@csrf_exempt
 def action(request):
+    """
+    处理对服务器任务的调度信息。
+    """
     server = request.POST['server']
     supervisor = _get_supervisor(server.split('_')[0], server.split('_')[1])
     try:
@@ -250,8 +273,12 @@ def action(request):
         supervisor("close")()
     return redirect(settings.SITE_ROOT)
 
+
 @csrf_exempt
 def get_program_logs(request):
+    """
+    获取指定服务器的任务信息
+    """
     logs = "Logs for program {}:{} in server {}".format(
         request.GET['group'], request.GET['program'], request.GET['server'])
     stream = request.GET['stream']
@@ -260,7 +287,7 @@ def get_program_logs(request):
     full_name = "{}:{}".format(request.GET['group'],
                                request.GET['program'])
     if stream == 'stdout':
-        supervisor = _get_supervisor(request.GET['server'].split('_')[0],request.GET['server'].split('_')[1])
+        supervisor = _get_supervisor(request.GET['server'].split('_')[0], request.GET['server'].split('_')[1])
         try:
             logs, _offeset, _overflow = \
                 supervisor.supervisor.tailProcessStdoutLog(
@@ -268,7 +295,7 @@ def get_program_logs(request):
         finally:
             supervisor("close")()
     elif stream == 'stderr':
-        supervisor = _get_supervisor(request.GET['server'].split('_')[0],request.GET['server'].split('_')[1])
+        supervisor = _get_supervisor(request.GET['server'].split('_')[0], request.GET['server'].split('_')[1])
         try:
             logs, _offeset, _overflow = \
                 supervisor.supervisor.tailProcessStderrLog(
@@ -331,4 +358,3 @@ def _get_metadata_conf():
                 taggroups[taggroup_name].label = label
 
     return mappings, tags_config, taggroups
-
