@@ -59,7 +59,7 @@ SPLASH_MIDDLEWARES = {
     'scrapy_splash.SplashMiddleware': 725,
     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
 }
-if config.getbool("splash_setting", "enable_splash"):
+if config.getboolean("splash_setting", "enable_splash"):
     settings.SPLASH_URL = "http://splash:8050"
     if hasattr(settings, "DOWNLOADER_MIDDLEWARES"):
         settings.DOWNLOADER_MIDDLEWARES = dict(settings.DOWNLOADER_MIDDLEWARES.items() + SPLASH_MIDDLEWARES.items())
