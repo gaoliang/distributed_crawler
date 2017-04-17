@@ -11,11 +11,19 @@ config.readfp(open('custom_settings.conf'))
 
 # settings for anti_ban
 settings.COOKIES_ENABLED = config.getboolean("spider_custom_settings", "enable_cookies")
-settings.DOWNLOAD_DELAY = config.getint("spider_custom_settings", "download_delay")
+settings.DOWNLOAD_DELAY = config.getfloat("spider_custom_settings", "download_delay")
 
 # setting dbs
 settings.REDIS_HOST = config.get("redis_setting", "redis_host")
 settings.REDIS_PORT = config.get("redis_setting", "redis_port")
+settings.ROBOTSTXT_OBEY = False
+settings.SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+settings.DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+settings.SCHEDULER_PERSIST = True
+settings.ITEM_PIPELINES = {
+    'scrapy_redis.pipelines.RedisPipeline': 300
+}
+
 
 # settings splash
 SPLASH_MIDDLEWARES = {
@@ -25,14 +33,16 @@ SPLASH_MIDDLEWARES = {
 }
 if config.get("splash_setting", "enable_splash"):
     SPLASH_URL = config.get("splash_setting", "splash_url")
-    print SPLASH_URL
-    settings.DOWNLOADER_MIDDLEWARES = dict(settings.DOWNLOADER_MIDDLEWARES.items() + SPLASH_MIDDLEWARES.items())
+    if hasattr(settings, "DOWNLOADER_MIDDLEWARES"):
+        settings.DOWNLOADER_MIDDLEWARES = dict(settings.DOWNLOADER_MIDDLEWARES.items() + SPLASH_MIDDLEWARES.items())
+    else:
+        settings.DOWNLOADER_MIDDLEWARES = SPLASH_MIDDLEWARES
 
-
-# for custom middlewares
-package = settings.BOT_NAME
-settings.DOWNLOADER_MIDDLEWARES[package + ".middlewares.downloadmiddlewares.MySplashMetaMiddlewares"] = 500
-settings.DOWNLOADER_MIDDLEWARES[
-    package + '.middlewares.downloadmiddlewares.MyProcessResponseDownloadMiddleware'] = 900
-settings.DOWNLOADER_MIDDLEWARES[
-    package + '.middlewares.downloadmiddlewares.MyProcessExceptionDownloadMiddleware'] = 920
+    package = settings.BOT_NAME
+    if not hasattr(settings,"DOWNLOADER_MIDDLEWARES"):
+        settings.DOWNLOADER_MIDDLEWARES = {}
+    settings.DOWNLOADER_MIDDLEWARES[package + ".middlewares.downloadmiddlewares.MySplashMetaMiddlewares"] = 500
+    settings.DOWNLOADER_MIDDLEWARES[
+        package + '.middlewares.downloadmiddlewares.MyProcessResponseDownloadMiddleware'] = 900
+    settings.DOWNLOADER_MIDDLEWARES[
+            package + '.middlewares.downloadmiddlewares.MyProcessExceptionDownloadMiddleware'] = 920

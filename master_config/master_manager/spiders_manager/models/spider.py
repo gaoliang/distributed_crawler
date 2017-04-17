@@ -17,7 +17,10 @@ class SpiderDoc(Document):
         'created_at': datetime,
         'file': bson.binary.Binary,
         'filename': basestring,
-        'machines': list
+        'machines': list,
+        'anti_ban': list,
+        'redis_address': basestring,
+        'mongo_address': basestring
     }
     required_fields = ['name', 'file']
 

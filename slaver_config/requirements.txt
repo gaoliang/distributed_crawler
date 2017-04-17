@@ -55,3 +55,4 @@ whitenoise==3.3.0
 zope.interface==4.3.3
 pyinotify
 Flask
+configparser==3.5.0

@@ -71,8 +71,13 @@ def add_spider(request):
     except:
         return JsonResponse({'success': False, 'reason': "未上传爬虫文件"})
     spider['name'] = filename.split('.')[0]
+
+    spider['anti_ban'] = request.POST.getlist('anti_ban')
+    spider['redis_address'] = request.POST['redis_address']
+    spider['mongo_address'] = request.POST['mongo_address']
+
     spider.save()
-    print spider
+    gen_conf(spider)
     return JsonResponse({'success': True})
 
 
@@ -85,7 +90,11 @@ def deploy_spider(request):
     hostname = ip.split(':')[0]
     port = ip.split(':')[1]
     spider = spider_collection.SpiderDoc.find_one({'name': request.POST['name']})
-    trans_file(hostname, port, filename=spider['filename'], file=BytesIO(spider['file']))
+    custom_settings = gen_conf(spider)
+    custom_settings = gen_conf(spider)
+
+    trans_file(hostname, port, filename=spider['filename'], file=BytesIO(spider['file']),
+               custom_settings=custom_settings)
     if ip in spider['machines']:
         return JsonResponse({"success": False})
     spider['machines'].append(ip)
@@ -106,7 +115,7 @@ def ajax_machines(request):
     return JsonResponse({"ips": hostnames})
 
 
-def trans_file(hostname, port, file, filename, spider_type='scrapy'):
+def trans_file(hostname, port, file, filename, custom_settings, spider_type='scrapy', ):
     """
     传输爬虫文件到服务器
     :param hostname: 服务器地址
@@ -116,7 +125,9 @@ def trans_file(hostname, port, file, filename, spider_type='scrapy'):
     :return: 返回json，格式为 {"success":True or False}
     """
     files = {'file': (filename, file)}
-    r = requests.post("http://{}:{}/api/upload".format(hostname, port), files=files, data={'type': spider_type})
+    r = requests.post("http://{}:{}/api/upload".format(hostname, port), files=files,
+                      data={'type': spider_type, "custom_settings": custom_settings})
+    print r.text
     result = json.loads(r.text)
     print result
 
@@ -381,3 +392,38 @@ def del_spider(request):
         print r.text
     spider_collection.remove({"name": name})
     return JsonResponse({'success': True})
+
+
+def normal_scrapy_to_distributed(scrapy_files):
+    pass
+
+
+def gen_conf(spider_info_dict):
+    conf_template = """[spider_custom_settings]
+enable_cookies={enable_cookies}
+download_delay = {download_delay}
+random_ua = {random_ua}
+
+;[mongo_settings]
+;mongo_host = {mongo_host}
+;mongo_port = {mongo_port}
+
+[redis_setting]
+redis_host = {redis_host}
+redis_port = {redis_port}
+
+[splash_setting]
+enable_splash = {enable_splash}
+splash_url = http://127.0.0.1:8050
+
+"""
+    conf_dict = {}
+    conf_dict['enable_cookies'] = "false" if "disable_cookie" in spider_info_dict['anti_ban'] else "true"
+    conf_dict['download_delay'] = 2 if "request_delay" in spider_info_dict['anti_ban'] else 0.25
+    conf_dict['enable_splash'] = "true" if "enable_js" in spider_info_dict['anti_ban'] else "false"
+    conf_dict['random_ua'] = "true" if "random_ua" in spider_info_dict['anti_ban'] else "false"
+    conf_dict['mongo_host'] = spider_info_dict['mongo_address'].split(':')[0]
+    conf_dict['mongo_port'] = spider_info_dict['mongo_address'].split(':')[1]
+    conf_dict['redis_host'] = spider_info_dict['redis_address'].split(':')[0]
+    conf_dict['redis_port'] = spider_info_dict['redis_address'].split(':')[1]
+    return conf_template.format(**conf_dict)

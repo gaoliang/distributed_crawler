@@ -366,21 +366,23 @@
         {# closes server #}
 
         {% endfor %} {# servers loop #}
-        	<div class="modal fade" id="show-logs-dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	  <div class="modal-dialog modal-lg">
-		<div class="modal-content">
-		  <div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h4 class="modal-title" id="a_labek">Modal title</h4>
-		  </div>
-		  <div class="modal-body"><pre></pre>
-		  </div>
-		  <div class="modal-footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-		  </div>
-		</div>
-	  </div>
-	</div>
+        <div class="modal fade" id="show-logs-dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="a_labek">Modal title</h4>
+                    </div>
+                    <div class="modal-body">
+                        <pre></pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <!--row2 end-->
 </div>
@@ -432,6 +434,29 @@
                     <div class="form-group">
                         <label for="zip_file">爬虫项目</label>
                         <input type="file" id="zip_file" name="zip_file">
+                    </div>
+                    <label for="anti_ban">选择扩展的反反爬虫策略插件</label>
+                    <div class="checkbox" id="anti_ban">
+                        <label>
+                            <input type="checkbox" value="disable_cookie" name="anti_ban">禁用cookie
+                        </label>
+                        <label>
+                            <input type="checkbox" value="random_ua" name="anti_ban">随机UA
+                        </label>
+                        <label>
+                            <input type="checkbox" value="enable_js" name="anti_ban">启用分布式页面js渲染
+                        </label>
+                        <label>
+                            <input type="checkbox" value="request_delay" name="anti_ban">启用请求延时
+                        </label>
+                    </div>
+                     <div class="form-group">
+                        <label for="redis_address">redis消息与去重服务器地址： 格式 ip:端口</label>
+                        <input type="text" id="redis_address" name="redis_address" class="form-control">
+                    </div>
+                     <div class="form-group">
+                        <label for="mongo_address">mongo数据存储服务器地址： 格式 ip:端口</label>
+                        <input type="text" id="mongo_address" name="mongo_address" class="form-control">
                     </div>
                 </form>
             </div>
