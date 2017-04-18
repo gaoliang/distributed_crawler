@@ -383,7 +383,7 @@ function open_stream(button, stream) {
                     stream: stream,
                     program: program,
                     group: group,
-                    server: server.replace(/\./g,'\\.'),
+                    server: server.replace(/\./g, '\\.'),
                 }))
 
         $('#show-logs-dialog').modal()
@@ -430,9 +430,10 @@ window.on_startall_clicked = function (button) {
             csrftoken: csrftoken,
             server: server,
             action_start_all: true,
+        },
+        success: function () {
+            $(button).button('reset')
         }
-    }).done(function () {
-        $(button).button('reset')
     })
 
 
@@ -452,10 +453,13 @@ function _group_action(button, action) {
     $.ajax({
         url: get_ajax_url('action'),
         type: 'POST',
-        data: data
-    }).done(function () {
-        $(button).button('reset')
+        data: data,
+        success: function () {
+            alert(1234444)
+            $(button).button('reset')
+        }
     })
+
 }
 
 window.on_group_start_clicked = function (button) {
@@ -573,15 +577,14 @@ window.on_show_no_tags_clicked = function () {
 
 
 function start_group_on_all(spider_name) {
-    $(".group[data-group-name='"+spider_name+"']").each(function (index,element) {
-       _group_action($(element).find('.btn-primary')[0],'action_start')
+    $(".group[data-group-name='" + spider_name + "']").each(function (index, element) {
+        _group_action($(element).find('.btn-primary')[0], 'action_start')
     })
 }
 
 
-
 function stop_group_on_all(spider_name) {
-    $(".group[data-group-name='"+spider_name+"']").each(function (index,element) {
-        _group_action($(element).find('.btn-primary')[2],'action_stop')
+    $(".group[data-group-name='" + spider_name + "']").each(function (index, element) {
+        _group_action($(element).find('.btn-primary')[2], 'action_stop')
     })
 }
