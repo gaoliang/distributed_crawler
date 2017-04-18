@@ -10,5 +10,4 @@ import scrapy
 
 class NewsItem(scrapy.Item):
     url = scrapy.Field()
-    desc = scrapy.Field()
-    pass
+    content = scrapy.Field()
