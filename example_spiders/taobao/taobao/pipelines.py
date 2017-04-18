@@ -6,6 +6,7 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 
-class DistributedCrawlerPipeline(object):
+class TaobaoPipeline(object):
     def process_item(self, item, spider):
+        print item
         return item

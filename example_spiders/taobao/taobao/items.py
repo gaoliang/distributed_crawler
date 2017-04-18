@@ -8,7 +8,11 @@
 import scrapy
 
 
-class DistributedCrawlerItem(scrapy.Item):
+class TaobaoItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    title=scrapy.Field()
+    link=scrapy.Field()
+    price=scrapy.Field()
+    comment=scrapy.Field()
+    original_price=scrapy.Field()
