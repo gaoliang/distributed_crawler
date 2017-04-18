@@ -1,2 +1,0 @@
--r requirements.txt
-page_clustering==0.0.1

@@ -20,7 +20,10 @@ class SpiderDoc(Document):
         'machines': list,
         'anti_ban': list,
         'redis_address': basestring,
-        'mongo_address': basestring
+        'mongo_address': basestring,
+        'crom':basestring,
+        'priority':int,
+        'type':basestring,
     }
     required_fields = ['name', 'file']
 

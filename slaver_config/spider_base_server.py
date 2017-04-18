@@ -17,6 +17,7 @@ directory=/app/spider_cli/spiders/{0}
 command=scrapy crawl {0}
 stdout_logfile=/var/log/supervisor/{0}_stdout.log
 redirect_stderr=true
+priority={1}
 autostart=false
 """
 portia_conf_tempaltes = """
@@ -25,6 +26,7 @@ directory=/app/spider_cli/spiders
 command=portiacrawl {0} {0}
 stdout_logfile=/var/log/supervisor/{0}_stdout.log
 redirect_stderr=true
+priority={1}
 autostart=false
 """
 
@@ -34,6 +36,8 @@ import ConfigParser
 
 import settings
 
+package = "%s"
+
 config = ConfigParser.RawConfigParser(allow_no_value=True)
 config.readfp(open('custom_settings.conf'))
 
@@ -42,14 +46,17 @@ settings.COOKIES_ENABLED = config.getboolean("spider_custom_settings", "enable_c
 settings.DOWNLOAD_DELAY = config.getfloat("spider_custom_settings", "download_delay")
 
 # setting dbs
-settings.REDIS_HOST = config.get("redis_setting", "redis_host")
-settings.REDIS_PORT = config.get("redis_setting", "redis_port")
+settings.REDIS_HOST = config.get("redis_setting","redis_host")
+settings.REDIS_PORT = config.get("redis_setting","redis_port")
+settings.MONGO_HOST = config.get("mongo_settings","mongo_host")
+settings.MONGO_PORT = config.get("mongo_settings","mongo_port")
 settings.ROBOTSTXT_OBEY = False
 settings.SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 settings.DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 settings.SCHEDULER_PERSIST = True
 settings.ITEM_PIPELINES = {
-    'scrapy_redis.pipelines.RedisPipeline': 300
+    'scrapy_redis.pipelines.RedisPipeline': 300,
+    package + ".mongopipline.MongoPipeline": 400
 }
 
 
@@ -65,7 +72,6 @@ if config.getboolean("splash_setting", "enable_splash"):
         settings.DOWNLOADER_MIDDLEWARES = dict(settings.DOWNLOADER_MIDDLEWARES.items() + SPLASH_MIDDLEWARES.items())
     else:
         settings.DOWNLOADER_MIDDLEWARES = SPLASH_MIDDLEWARES
-    package = "%s"
     settings.DOWNLOADER_MIDDLEWARES[package + ".middlewares.downloadmiddlewares.MySplashMetaMiddlewares"] = 500
     settings.DOWNLOADER_MIDDLEWARES[
         package + '.middlewares.downloadmiddlewares.MyProcessResponseDownloadMiddleware'] = 900
@@ -189,14 +195,45 @@ class MyProcessExceptionDownloadMiddleware(object):
 
 """
 
+mongo_pipline = """
+import pymongo
 
-def create_conf(spider_name, spider_type):
+from scrapy.conf import settings
+from scrapy.exceptions import DropItem
+from scrapy import log
+
+
+class MongoPipeline(object):
+
+    def __init__(self):
+        connection = pymongo.MongoClient(
+            settings['MONGO_HOST'],
+           int(settings['MONGO_PORT'])
+        )
+        db = connection["items"]
+        self.collection = db["%d"]
+
+    def process_item(self, item, spider):
+        valid = True
+        for data in item:
+            if not data:
+                valid = False
+                raise DropItem("Missing {0}!".format(data))
+        if valid:
+            self.collection.insert(dict(item))
+            log.msg("Question added to MongoDB database!",
+                    level=log.DEBUG, spider=spider)
+        return item
+"""
+
+
+def create_conf(spider_name, spider_type,priority):
     file_path = os.path.join(config_dir, spider_name + ".conf")
     with open(file_path, "w") as f:
         if spider_type == "scrapy":
-            f.write(scrapy_conf_templates.format(spider_name))
+            f.write(scrapy_conf_templates.format(spider_name, priority))
         elif spider_type == "portia":
-            f.write(portia_conf_tempaltes.format(spider_name))
+            f.write(portia_conf_tempaltes.format(spider_name, priority))
 
 
 def un_zip(file_name):
@@ -230,9 +267,10 @@ def api_upload():
     f = request.files['file']  # 从表单的file字段获取文件，myfile为该表单的name值
     spider_type = request.form['type']
     custom_settings = request.form['custom_settings']
+    priority = request.form['priority']
     if f and allowed_file(f.filename):  # 判断是否是允许上传的文件类型
         filename = secure_filename(f.filename)
-        create_conf(filename.split('.')[0], spider_type)
+        create_conf(filename.split('.')[0], spider_type,priority)
         f.save(os.path.join(file_dir, filename))  # 保存文件到upload目录
         un_zip(os.path.join(file_dir, filename))
         os.system("supervisorctl update")
@@ -246,8 +284,8 @@ def api_upload():
                 os.path.join(file_dir, filename.split('.')[0] + "/" + filename.split('.')[0] + '/middlewares')):
             os.makedirs(os.path.join(file_dir, filename.split('.')[0] + "/" + filename.split('.')[0] + '/middlewares'))
         with open(os.path.join(file_dir, filename.split('.')[0] + "/" + filename.split('.')[
-            0] + "/middlewares/downloadmiddlewares.py"), "w+") as f:
-            f.write(middleware_template)
+            0] + "/mongopipline.py"), "w+") as f:
+            f.write(mongo_pipline.format(filename.split('.')[0]))
 
         with open(os.path.join(file_dir,
                                filename.split('.')[0] + "/" + filename.split('.')[0] + "/middlewares/__init__.py"),

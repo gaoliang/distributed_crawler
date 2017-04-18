@@ -71,11 +71,11 @@ def add_spider(request):
     except:
         return JsonResponse({'success': False, 'reason': "未上传爬虫文件"})
     spider['name'] = filename.split('.')[0]
-
+    spider['priority'] = int(request.POST['priority'])
     spider['anti_ban'] = request.POST.getlist('anti_ban')
     spider['redis_address'] = request.POST['redis_address']
     spider['mongo_address'] = request.POST['mongo_address']
-
+    spider['type'] = request.POST['type']
     spider.save()
     gen_conf(spider)
     return JsonResponse({'success': True})
@@ -91,9 +91,9 @@ def deploy_spider(request):
     port = ip.split(':')[1]
     spider = spider_collection.SpiderDoc.find_one({'name': request.POST['name']})
     custom_settings = gen_conf(spider)
-    custom_settings = gen_conf(spider)
 
-    trans_file(hostname, port, filename=spider['filename'], file=BytesIO(spider['file']),
+    trans_file(hostname, port, filename=spider['filename'], file=BytesIO(spider['file']), priority=spider['priority'],
+               spider_type=spider['type'],
                custom_settings=custom_settings)
     if ip in spider['machines']:
         return JsonResponse({"success": False})
@@ -115,7 +115,7 @@ def ajax_machines(request):
     return JsonResponse({"ips": hostnames})
 
 
-def trans_file(hostname, port, file, filename, custom_settings, spider_type='scrapy', ):
+def trans_file(hostname, port, file, filename, custom_settings, priority=999, spider_type='scrapy', ):
     """
     传输爬虫文件到服务器
     :param hostname: 服务器地址
@@ -126,7 +126,7 @@ def trans_file(hostname, port, file, filename, custom_settings, spider_type='scr
     """
     files = {'file': (filename, file)}
     r = requests.post("http://{}:{}/api/upload".format(hostname, port), files=files,
-                      data={'type': spider_type, "custom_settings": custom_settings})
+                      data={'type': spider_type, "custom_settings": custom_settings, 'priority': priority})
     print r.text
     result = json.loads(r.text)
     print result
@@ -372,6 +372,7 @@ def _get_metadata_conf():
     return mappings, tags_config, taggroups
 
 
+@csrf_exempt
 def del_deployed_spider(request):
     name = request.POST['name']
     machines = spider_collection.find_one({"name": name})['machines']
@@ -384,6 +385,7 @@ def del_deployed_spider(request):
     return JsonResponse({'success': True})
 
 
+@csrf_exempt
 def del_spider(request):
     name = request.POST['name']
     machines = spider_collection.find_one({"name": name})['machines']
@@ -404,9 +406,9 @@ enable_cookies={enable_cookies}
 download_delay = {download_delay}
 random_ua = {random_ua}
 
-;[mongo_settings]
-;mongo_host = {mongo_host}
-;mongo_port = {mongo_port}
+[mongo_settings]
+mongo_host = {mongo_host}
+mongo_port = {mongo_port}
 
 [redis_setting]
 redis_host = {redis_host}

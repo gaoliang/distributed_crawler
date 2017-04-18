@@ -1,9 +1,0 @@
-.list-item-combo {
-    flex: 1 1 auto;
-    min-width: 0;
-
-    .list-item-editable + &,
-    & + & {
-        flex-grow: 0;
-    }
-}

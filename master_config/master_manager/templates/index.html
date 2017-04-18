@@ -435,6 +435,23 @@
                         <label for="zip_file">爬虫项目</label>
                         <input type="file" id="zip_file" name="zip_file">
                     </div>
+
+                    <div class="form-group">
+                        <label for="priority">优先级(1-999)</label>
+                        <input type="number" id="priority" name="priority" class="form-control" value="999">
+                    </div>
+
+                    <label for="type_sel">爬虫类型</label>
+                    <div class="radio" id="type_sel">
+                        <label>
+                            <input type="radio" name="type" id="optionsRadios1" value="scrapy" checked>
+                            scrapy
+                        </label>
+                        <label>
+                            <input type="radio" name="type" id="optionsRadios2" value="portia">
+                            protia
+                        </label>
+                    </div>
                     <label for="anti_ban">选择扩展的反反爬虫策略插件</label>
                     <div class="checkbox" id="anti_ban">
                         <label>
@@ -450,11 +467,11 @@
                             <input type="checkbox" value="request_delay" name="anti_ban">启用请求延时
                         </label>
                     </div>
-                     <div class="form-group">
+                    <div class="form-group">
                         <label for="redis_address">redis消息与去重服务器地址： 格式 ip:端口</label>
                         <input type="text" id="redis_address" name="redis_address" class="form-control">
                     </div>
-                     <div class="form-group">
+                    <div class="form-group">
                         <label for="mongo_address">mongo数据存储服务器地址： 格式 ip:端口</label>
                         <input type="text" id="mongo_address" name="mongo_address" class="form-control">
                     </div>
