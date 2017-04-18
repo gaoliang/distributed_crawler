@@ -1,0 +1,19 @@
+<h3>Crawling rules</h3>
+<form {{action "save" on="change"}}>
+    {{#if (eq spider.linksToFollow 'all')}}
+        <div class="text-muted">跟踪起始页域名下的链接</div>
+    {{else if (eq spider.linksToFollow 'none')}}
+        <div class="text-muted">不跟踪任何链接</div>
+    {{else if (eq spider.linksToFollow 'patterns')}}
+        <div>跟踪符合指定正则表达式的链接</div>
+        {{regex-pattern-list list=spider.followPatterns onChange=(action 'save')}}
+        <div>不跟踪符合指定正则表达式的链接</div>
+        {{regex-pattern-list list=spider.excludePatterns onChange=(action 'save')}}
+    {{/if}}
+
+    <div class="checkbox">
+        <label>
+            {{input type="checkbox" name="respectNoFollow" checked=(mut spider.respectNoFollow) disabled=(eq spider.linksToFollow 'none')}} Respect the "nofollow" attribute
+        </label>
+    </div>
+</form>

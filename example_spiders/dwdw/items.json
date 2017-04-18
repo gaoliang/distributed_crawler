@@ -1,0 +1,14 @@
+{
+    "b1bd-40b4-acaa": {
+        "fields": {
+            "bdf5-43ca-b376": {
+                "id": "bdf5-43ca-b376", 
+                "name": "name", 
+                "required": false, 
+                "type": "text", 
+                "vary": false
+            }
+        }, 
+        "name": "- -"
+    }
+}

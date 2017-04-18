@@ -12,6 +12,68 @@ ALLOWED_EXTENSIONS = {'zip'}
 
 config_dir = '/etc/supervisor/conf.d/'
 
+portia_settings_templates ="""
+import ConfigParser
+import os
+
+SPIDER_MANAGER_CLASS = 'slybot.spidermanager.ZipfileSlybotSpiderManager'
+EXTENSIONS = {'slybot.closespider.SlybotCloseSpider': 1}
+SPIDER_MIDDLEWARES = {'slybot.spiderlets.SpiderletsMiddleware': 999}  # as close as possible to spider output
+
+DOWNLOADER_MIDDLEWARES = {
+    'slybot.pageactions.PageActionsMiddleware': 700,
+}
+PLUGINS = [
+    'slybot.plugins.scrapely_annotations.Annotations',
+    'slybot.plugins.selectors.Selectors'
+]
+SLYDUPEFILTER_ENABLED = False
+
+PROJECT_ZIPFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+
+
+import ConfigParser
+
+PACKAGE = "%s"
+
+config = ConfigParser.RawConfigParser(allow_no_value=True)
+config.readfp(open(os.path.join('/usr/local/lib/python2.7/dist-packages/',PACKAGE + '_custom_settings.conf')))
+
+# settings for anti_ban
+COOKIES_ENABLED = config.getboolean("spider_custom_settings", "enable_cookies")
+DOWNLOAD_DELAY = config.getfloat("spider_custom_settings", "download_delay")
+
+# setting dbs
+REDIS_HOST = config.get("redis_setting","redis_host")
+REDIS_PORT = config.get("redis_setting","redis_port")
+MONGO_HOST = config.get("mongo_settings","mongo_host")
+MONGO_PORT = config.get("mongo_settings","mongo_port")
+ROBOTSTXT_OBEY = False
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+SCHEDULER_PERSIST = True
+ITEM_PIPELINES = {
+    'scrapy_redis.pipelines.RedisPipeline': 300,
+    "mongopipline.MongoPipeline": 400
+}
+
+
+# settings splash
+SPLASH_MIDDLEWARES = {
+    'scrapy_splash.SplashCookiesMiddleware': 723,
+    'scrapy_splash.SplashMiddleware': 725,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
+}
+if config.getboolean("splash_setting", "enable_splash"):
+    SPLASH_URL = "http://splash:8050"
+    DOWNLOADER_MIDDLEWARES = dict(DOWNLOADER_MIDDLEWARES.items() + SPLASH_MIDDLEWARES.items())
+    DOWNLOADER_MIDDLEWARES["downloadmiddlewares.MySplashMetaMiddlewares"] = 500
+    DOWNLOADER_MIDDLEWARES['downloadmiddlewares.MyProcessResponseDownloadMiddleware'] = 900
+    DOWNLOADER_MIDDLEWARES['downloadmiddlewares.MyProcessExceptionDownloadMiddleware'] = 920
+
+"""
+
 scrapy_conf_templates = """[program:{0}]
 directory=/app/spider_cli/spiders/{0}
 command=scrapy crawl {0}
@@ -23,7 +85,7 @@ autostart=false
 portia_conf_tempaltes = """
 [program:{0}]
 directory=/app/spider_cli/spiders
-command=portiacrawl {0} {0}
+command=portiacrawl {0} {0}  --settings {0}_settings
 stdout_logfile=/var/log/supervisor/{0}_stdout.log
 redirect_stderr=true
 priority={1}
@@ -270,30 +332,39 @@ def api_upload():
     priority = request.form['priority']
     if f and allowed_file(f.filename):  # 判断是否是允许上传的文件类型
         filename = secure_filename(f.filename)
-        create_conf(filename.split('.')[0], spider_type,priority)
+
+        spider_name = filename.split('.')[0]
+        create_conf(spider_name, spider_type,priority)
         f.save(os.path.join(file_dir, filename))  # 保存文件到upload目录
-        un_zip(os.path.join(file_dir, filename))
+        un_zip(os.path.join(file_dir, filename))    
         os.system("supervisorctl update")
-        with open(os.path.join(file_dir, filename.split('.')[0] + "/custom_settings.conf"), "w+") as f:
-            f.write(custom_settings)
-        with open(os.path.join(file_dir, filename.split('.')[0] + "/" + filename.split('.')[0] + "/__init__.py"),
-                  "w+") as f:
-            f.write(init_py_template % filename.split('.')[0])
+        if spider_type == "scrapy":
+            with open(os.path.join(file_dir, spider_name + "/custom_settings.conf"), "w+") as f:
+                f.write(custom_settings)
+            with open(os.path.join(file_dir, spider_name + "/" + spider_name + "/__init__.py"),
+                      "w+") as f:
+                f.write(init_py_template % spider_name)
 
-        if not os.path.exists(
-                os.path.join(file_dir, filename.split('.')[0] + "/" + filename.split('.')[0] + '/middlewares')):
-            os.makedirs(os.path.join(file_dir, filename.split('.')[0] + "/" + filename.split('.')[0] + '/middlewares'))
-        with open(os.path.join(file_dir, filename.split('.')[0] + "/" + filename.split('.')[
-            0] + "/mongopipline.py"), "w+") as f:
-            f.write(mongo_pipline.format(filename.split('.')[0]))
+            if not os.path.exists(
+                    os.path.join(file_dir, spider_name + "/" + spider_name + '/middlewares')):
+                os.makedirs(os.path.join(file_dir, spider_name + "/" + spider_name + '/middlewares'))
+            with open(os.path.join(file_dir, spider_name + "/" + filename.split('.')[
+                0] + "/mongopipline.py"), "w+") as f:
+                f.write(mongo_pipline.format(spider_name))
 
-        with open(os.path.join(file_dir,
-                               filename.split('.')[0] + "/" + filename.split('.')[0] + "/middlewares/__init__.py"),
-                  "w+") as f:
-            pass
-        with open(os.path.join(file_dir, filename.split('.')[0] + "/" + filename.split('.')[0] + "/__init__.py"),
-                  "w+") as f:
-            f.write(init_py_template % filename.split('.')[0])
+            with open(os.path.join(file_dir,
+                                   spider_name + "/" + spider_name + "/middlewares/__init__.py"),
+                      "w+") as f:
+                pass
+            with open(os.path.join(file_dir, spider_name + "/" + spider_name + "/__init__.py"),
+                      "w+") as f:
+                f.write(init_py_template % spider_name)
+        elif spider_type=="portia":
+            with open(os.path.join("/usr/local/lib/python2.7/dist-packages/",spider_name + "_settings.py"),
+                      "w+") as f:
+                f.write(portia_settings_templates % spider_name)
+            with open(os.path.join("/usr/local/lib/python2.7/dist-packages/",spider_name + "_custom_settings.conf"), "w+") as f:
+                f.write(custom_settings)
 
         return jsonify({"success": True, "errmsg": ""})
     else:

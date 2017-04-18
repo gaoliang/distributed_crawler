@@ -1,0 +1,17 @@
+{
+    "allowed_domains": [], 
+    "exclude_patterns": [], 
+    "follow_patterns": [], 
+    "id": "dwdw", 
+    "js_disable_patterns": [], 
+    "js_enable_patterns": [], 
+    "js_enabled": false, 
+    "links_to_follow": "all", 
+    "respect_nofollow": false, 
+    "start_urls": [
+        {
+            "type": "url", 
+            "url": "https://search.jd.com/Search?keyword=%E6%89%8B%E6%9C%BA&enc=utf-8&wq=%E6%89%8B%E6%9C%BA&pvid=eb2891d33a0843bfa5711a7cafdc55a8"
+        }
+    ]
+}

@@ -1,0 +1,159 @@
+2.0.7 - 2017-03-28
+
+Pin ember data to 2.11.x
+Do not initialize tree mirror in web page until after initial page load
+Change order of compilation for injected JS files in splash
+Set text content correctly for html elements with a content attribute
+
+2.0.6 - 2017-03-07
+
+Add option to have default data format for project
+Do not show any version control info if it is not enabled
+Fix Extractor overflow bug
+Fix error when loading broken samples in UI
+Fix splash browser tab storing wrong html
+Fix bug with repr for tab
+
+2.0.5 - 2017-02-27
+
+Add data directory for storing spider data and ignore all new data in it
+Update install instructions and scripts
+Update Docs
+Throw KeyError when trying to get non existent model from collection
+Fix loading html as raw from the tab in the socket for extraction
+Fix missing objects in branch by deleting the branch
+Fix UnicodeDecodeError for downloads and css parsing
+Fix bytes/unicode issue with slybot extractors
+
+2.0.4 - 2017-02-23
+
+Fix error when trying to load assets by proxy from an invalid tab
+Fix value resolved to `None` when merging lists
+Fix unicode error in regex for removing XSS from CSS assets
+Fix sample loading for old spiders
+Fix for running legacy spiders
+Fix storage being cleared by another message while in use
+Fix error caused by downloading invalid project name
+Disable error logging for missing websocket command, just log debug message
+Cache selector searches for container to increase sample build speed
+Do not throw error for missing annotation data in sample when finding schema
+Do not log model error when operating on deleted model
+
+2.0.3 - 2017-02-21
+
+Add download option for downloading a Portia project for use with slybot
+Add download option for downloading a Portia project as Python code
+Add copy for moving spiders from one project to another
+Add loading slider when changing page or loading models
+Add droplet to inform use that they have changes
+Add better message when websocket is reconnecting
+Add help icon describing what crawl rules do
+Add message informing user when they have an unused required field in their schema
+Add automatic selection of new field type in some cases
+Add dropdown for projects - publish, discard, download
+Add option to create new projects from UI (open source only)
+Add dropdown for spiders - Copy, Download and delete
+Add dropdown for schemas - delete
+Fix bug with using master when scheduling spider
+Fix error when errors with numeric ids are returned by server
+Fix spider listing loading in UI
+Fix so that project changes show up whenever there is a change
+Fix model not being loaded when changing field or schema
+Fix handling malformed extractor objects
+Fix merging html data during a conflict - take mine
+Fix when changing item schema in UI
+Fix extractors were not shown in UI
+Fix spiders would not run after a rename
+Fix deletes where file may be requested for delete more than once
+Fix with missing node when mirroring page from server
+Fix incorrect node data when mirroring page from server
+Fix loading extractors during migration
+Fix RuntimeError when loading tab url after tab has been closed
+Fix deletion of html files during cascade delete
+Fix loading extractors when reading annotations
+Fix loading html into sample in websocket for extraction
+Fix logged error due to missing `save_html` callback
+Fix html not being saved while creating sample
+Fix loading samples from `template_names` field instead of spider directory
+
+2.0.2 - 2017-01-20
+
+Gracefully handle missing objects in DB
+
+2.0.1 - 2017-01-19
+
+Limit number of spiders shown at once in UI to 15
+Fix scheduling when spider has been run from Portia
+Display helpful error messages to users
+Replace guid spider ids with spider name
+Add spider id if it is missing
+Add a schema for newly created items
+Fix PathResolutionError for unmigrated samples
+Better migrate samples that extract from tables
+
+2.0.0 - 2017-01-02
+Change backend to use Django instead of Twisted web
+Created a new JSON API and ORM to handle all Portia objects for greater consistency + efficiency
+Automatically detect if a user should enable or disable JS for better extraction
+Added support for generating urls
+Added support for using a feed as a start url
+Added support for extracting multiple values to a single field
+Added support for a spinner showing the extraction progress for a better UX
+Many bug fixes and stability improvements
+
+16.07.2 - 2016-07-26
+Fix bug with `project_filename` method missing Fix bug when initializing project
+
+16.05.1 - 2016-05-17
+New transactional request handling
+Inline element overlays (correctly show tags that may wrap around the page)
+New download endpoint for projects/spiders `GET portia/api/projects/<PROJECT_ID>/download[/<SPIDER_ID>]`
+Save selection_mode, pre_text and post_text for annotations
+Add toggle CSS button
+
+16.04.1 - 2016-04-05
+Add link to docs
+Add auto pagination, learns from start_urls
+Add git status endpoint for projects
+Load page when it is specified as url param `url`
+Save selection mode for annotation when using xpath/css selector
+Improve Portia on smaller screens Notify users of unpublished changes
+Reject annotations with elements that share a container with the hovered element
+Fix issue with extracting items with more than one sibling
+Fix bug where clicking on help icon toggled checkbox
+
+16.02.2 - 2016-02-16
+
+Fix incompatability with latest splash
+Fix error with next page link following
+Log traceback if error occurs in websocket
+
+16.02.1 - 2016-02-09
+Add automatic next page link extractor to slybot
+Show errors to user instead of event id
+Fix bug where items are not initialized correctly
+Log websocket errors
+Fix regex validation
+Fix conflicts resolution errors
+
+16.01.1 - 2016-01-25
+Fix Unicode error when creating spiders
+Fix install packages
+Extract data from a list of urls `POST portia/projects/<PROJECT>/spec/extract/<SPIDER> {"urls": ["http://example.com"]}`
+Allow `.` to be used in spider and sample names
+Correctly handle Atom, RSS and XML sitemaps
+Automatically dismiss suggested annotations if user doesn't use them
+Correctly place annotations when page contains `<ins>` tags
+Use Qt5 for internal splash instance
+Fix scrolling page action
+Fix URL validation
+
+15.12.2 - 2015-12-30
+Fix issue when copying spiders that reference deleted extractors
+Fix issue with using srcdoc in IE
+Enable annotation suggestions and page actions by default
+
+15.12.1 - 2015-12-03
+Fix issue with overwritten JSON library in splash
+Fix error when merging samples modified in one or more branches
+Fix event passing in Safari

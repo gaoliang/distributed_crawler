@@ -1,0 +1,73 @@
+{
+    "extractors": {}, 
+    "id": "3f46-4c4b-8f30", 
+    "name": "phone", 
+    "page_id": "", 
+    "page_type": "item", 
+    "plugins": {
+        "annotations-plugin": {
+            "extracts": [
+                {
+                    "annotations": {
+                        "#portia-content": "#dummy"
+                    }, 
+                    "container_id": null, 
+                    "id": "7b37-4b08-a3d4#parent", 
+                    "item_container": true, 
+                    "repeated": false, 
+                    "required": [], 
+                    "schema_id": "b1bd-40b4-acaa", 
+                    "selector": ".gl-warp", 
+                    "siblings": 0, 
+                    "tagid": null, 
+                    "text-content": "#portia-content"
+                }, 
+                {
+                    "annotations": {
+                        "#portia-content": "#dummy"
+                    }, 
+                    "container_id": "7b37-4b08-a3d4#parent", 
+                    "id": "7b37-4b08-a3d4", 
+                    "item_container": true, 
+                    "repeated": true, 
+                    "required": [], 
+                    "schema_id": "b1bd-40b4-acaa", 
+                    "selector": ".p-name-type-2 > a", 
+                    "siblings": 0, 
+                    "tagid": null, 
+                    "text-content": "#portia-content"
+                }, 
+                {
+                    "accept_selectors": [
+                        ".gl-item:nth-child(1) > .gl-i-wrap > .p-name > a > em", 
+                        ".gl-item:nth-child(2) > .gl-i-wrap > .p-name > a > em"
+                    ], 
+                    "container_id": "7b37-4b08-a3d4", 
+                    "data": {
+                        "2c16-462d-9417": {
+                            "attribute": "content", 
+                            "extractors": {}, 
+                            "field": "bdf5-43ca-b376", 
+                            "required": false
+                        }
+                    }, 
+                    "id": "8aef-43ed-be2b", 
+                    "post_text": null, 
+                    "pre_text": null, 
+                    "reject_selectors": [], 
+                    "repeated": false, 
+                    "required": [], 
+                    "selection_mode": "auto", 
+                    "selector": ".p-name-type-2 > a > em", 
+                    "tagid": null, 
+                    "text-content": "content", 
+                    "xpath": "//*[contains(concat(\" \", @class, \" \"), \" p-name-type-2 \")]/a/em"
+                }
+            ]
+        }
+    }, 
+    "scrapes": "b1bd-40b4-acaa", 
+    "spider": "dwdw", 
+    "url": "https://search.jd.com/Search?keyword=%E6%89%8B%E6%9C%BA&enc=utf-8&wq=%E6%89%8B%E6%9C%BA&pvid=eb2891d33a0843bfa5711a7cafdc55a8", 
+    "version": "0.13.0b36"
+}

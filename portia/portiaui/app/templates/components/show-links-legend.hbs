@@ -1,0 +1,14 @@
+{{#tree-list}}
+    {{#tree-list-item as |options|}}
+        {{list-item-badge value=followedLinks color=colors.green}}
+        跟踪
+    {{/tree-list-item}}
+    {{#tree-list-item as |options|}}
+        {{list-item-badge value=jsLinks color=colors.blue}}
+        当启用js时跟踪
+    {{/tree-list-item}}
+    {{#tree-list-item as |options|}}
+        {{list-item-badge value=ignoredLinks color=colors.red}}
+        不跟踪
+    {{/tree-list-item}}
+{{/tree-list}}

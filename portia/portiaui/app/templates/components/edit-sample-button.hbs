@@ -1,0 +1,22 @@
+{{#if editableSample}}
+    {{#link-to 'projects.project.spider.sample' editableSample class="btn btn-primary"}}
+        {{icon-button icon='sample'}} 编辑样例
+    {{/link-to}}
+{{else}}
+    {{#tooltip-container tooltipFor="add-spider-browser-button" tooltipContainer='body' as |options|}}
+        {{#if (eq options.section 'tooltip')}}
+            {{#unless editableSample}}
+                新建一个样例页面，这样你就可以在页面上标注需要提取的数据
+                {{#unless sameDomain}}
+                    <p>
+                        This spider is from a different domain to your spider. Maybe you would like to create a new spider for this sample?
+                    </p>
+                {{/unless}}
+            {{/unless}}
+        {{else}}
+            <button id="add-spider-browser-button" type="button" class="btn btn-primary" disabled={{disableSample}} {{action "addSample"}}>
+                {{icon-button icon='sample'}} 新样例
+            </button>
+        {{/if}}
+    {{/tooltip-container}}
+{{/if}}

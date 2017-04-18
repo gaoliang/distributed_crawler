@@ -1,0 +1,15 @@
+{
+    "template_names": [
+        "networkhealthtemplate",
+        "doesnotexist"
+    ],
+    "start_urls": [
+        "http://www.networkhealth.com/network-health-plan-info/all/find-a-doctor/index.aspx"
+    ],
+    "exclude_patterns": [],
+    "follow_patterns": [
+        "provider-detail.aspx\\?Id="
+    ],
+    "links_to_follow": "patterns",
+    "respect_nofollow": true
+}

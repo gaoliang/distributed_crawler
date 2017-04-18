@@ -1,0 +1,15 @@
+{{#tooltip-container tooltipFor=(concat "label-" elementId) tooltipContainer='body' as |tooltip|}}
+    {{#if (eq tooltip.section 'tooltip')}}
+        <p class="first">你的所有修改都会被自动保存</p>
+    {{else}}
+        <span id="label-{{elementId}}" class="label label-{{labelColorClass}}">
+            {{#if isSaving}}
+                保存 <span>.</span><span>.</span><span>.</span>
+            {{else if timeSinceLastSave}}
+                最后保存于 {{timeSinceLastSave}}
+            {{else}}
+                修改会被自动保存
+            {{/if}}
+        </span>
+    {{/if}}
+{{/tooltip-container}}
