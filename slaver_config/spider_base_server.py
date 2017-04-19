@@ -12,6 +12,7 @@ ALLOWED_EXTENSIONS = {'zip'}
 
 config_dir = '/etc/supervisor/conf.d/'
 
+# portia 爬虫的设置模板
 portia_settings_templates ="""
 import ConfigParser
 import os
@@ -74,6 +75,7 @@ if config.getboolean("splash_setting", "enable_splash"):
 
 """
 
+# scrapy爬虫的conf模板
 scrapy_conf_templates = """[program:{0}]
 directory=/app/spider_cli/spiders/{0}
 command=scrapy crawl {0}
@@ -82,6 +84,8 @@ redirect_stderr=true
 priority={1}
 autostart=false
 """
+
+# portia爬虫的conf模板
 portia_conf_tempaltes = """
 [program:{0}]
 directory=/app/spider_cli/spiders
@@ -92,6 +96,7 @@ priority={1}
 autostart=false
 """
 
+#scrapy爬虫的 init.py模板文件
 init_py_template = """
 
 import ConfigParser
@@ -141,6 +146,7 @@ if config.getboolean("splash_setting", "enable_splash"):
         package + '.middlewares.downloadmiddlewares.MyProcessExceptionDownloadMiddleware'] = 920
 """
 
+# spalsh相关的中间件模板
 middleware_template = """
 # -*-coding:utf-8-*-
 import random
@@ -257,6 +263,7 @@ class MyProcessExceptionDownloadMiddleware(object):
 
 """
 
+# mongo数据库的pipline 模板
 mongo_pipline = """
 import pymongo
 
@@ -371,7 +378,7 @@ def api_upload():
         return jsonify({"success": False, "errmsg": "上传失败"})
 
 
-# 上传文件
+# 删除文件
 @app.route('/api/delete', methods=['POST'], strict_slashes=False)
 def delete():
     name = request.form['name']
