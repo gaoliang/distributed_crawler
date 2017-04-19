@@ -16,7 +16,7 @@ Portia is a tool that allows you to visually scrape websites without any program
      cd node_modules/ember-cli && npm install && cd ../../
      ember build
      cd ..
-     docker build . -t 
+     docker build . -t portia
 
 # Run Portia
 
