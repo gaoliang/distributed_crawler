@@ -3,19 +3,25 @@ Portia
 
 Portia is a tool that allows you to visually scrape websites without any programming knowledge required. With Portia you can annotate a web page to identify the data you wish to extract, and Portia will understand based on these annotations how to scrape data from similar pages.
 
-# Try it out
 
-To try Portia for free without needing to install anything sign up for an account at [scrapinghub](https://portia.scrapinghub.com/) and you can use our hosted version.
+# Build Portia
 
-# Running Portia
+     curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+     sudo apt-get install -y nodejs
 
-The easiest way to run Portia is using Docker.
+     [workdir] portia/portiaui
+     npm install -g bower
+     npm install -g ember-cli@2.12
+     npm install && bower install
+     cd node_modules/ember-cli && npm install && cd ../../
+     ember build
+     cd ..
+     docker build . -t 
 
-You can run Portia using docker by running:
+# Run Portia
 
-    docker run -v ~/portia_projects:/app/data/projects:rw -p 9001:9001 scrapinghub/portia
-
-For more detailed instructions, and alternatives to using Docker, see the [Installation](http://portia.readthedocs.org/en/latest/installation.html) docs.
+      docker run -i -t --rm -p 9001:9001 –d portia
+ 
 
 # Documentation
 
